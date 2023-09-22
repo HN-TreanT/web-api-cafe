@@ -10,6 +10,9 @@ import { APP_FILTER } from "@nestjs/core";
 import { AllExceptionFilter } from "./filter/exception.filter";
 import { LoggerModule } from "./logger/logger.module";
 import { StorageModule } from "./helpers/storage/storage.module";
+import { EmployeeModule } from "./modules/employee/employee.module";
+import { AuthModule } from "./modules/auth/auth.module";
+import { PositionModule } from "./modules/position/position.module";
 
 @Module({
   imports: [
@@ -35,6 +38,9 @@ import { StorageModule } from "./helpers/storage/storage.module";
     databaseModule,
     LoggerModule,
     StorageModule,
+    EmployeeModule,
+    AuthModule,
+    PositionModule,
   ],
   controllers: [AppController],
   providers: [

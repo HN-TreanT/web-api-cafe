@@ -2,6 +2,26 @@ import { Sequelize } from "sequelize-typescript";
 
 import { SEQUELIZE, DEVELOPMENT, TEST, PRODUCTION } from "../constants";
 import { databaseConfig } from "./database.config";
+import { Employee } from "src/modules/employee/employee.entity";
+import { EmployeeWorkShift } from "src/modules/employee_workshift/employee_workshift.entity";
+import { Workshift } from "src/modules/workshift/workshift.entity";
+import { Position } from "src/modules/position/position.entity";
+import { Invoice } from "src/modules/invoice/invoice.entity";
+import { Customer } from "src/modules/customer/customer.entity";
+import { Promotion } from "src/modules/promotion/promotion.entity";
+import { TableFood } from "src/modules/table_food/table_food.entity";
+import { TableFoodInvoice } from "src/modules/table_food_invoice/table_food_invoice.entity";
+import { InvoiceDetail } from "src/modules/invoice_detail/invoice_detail.entity";
+import { Product } from "src/modules/product/product.entity";
+import { Category } from "src/modules/category/category.entity";
+import { DetailCombo } from "src/modules/detail_combo/detail_combo.entity";
+import { Combo } from "src/modules/combo/combo.entity";
+import { UseMaterial } from "src/modules/use_material/use_material.entity";
+import { Material } from "src/modules/material/material.entity";
+import { InventoryShortage } from "src/modules/inventory_shortage/inventory_shortage.entity";
+import { DetailShipment } from "src/modules/detail_shipment/detail_shipment.enitty";
+import { Shipment } from "src/modules/shipment/shipment.entity";
+import { Supplier } from "src/modules/supplier/supplier.entity";
 
 export const databaseProviders = [
   {
@@ -22,8 +42,29 @@ export const databaseProviders = [
           config = databaseConfig.development;
       }
       const sequelize = new Sequelize(config);
-      sequelize.addModels([]);
-      // await sequelize.sync();
+      sequelize.addModels([
+        Employee,
+        EmployeeWorkShift,
+        Workshift,
+        Position,
+        Invoice,
+        Customer,
+        Promotion,
+        TableFood,
+        TableFoodInvoice,
+        InvoiceDetail,
+        Product,
+        Category,
+        DetailCombo,
+        Combo,
+        UseMaterial,
+        Material,
+        InventoryShortage,
+        DetailShipment,
+        Shipment,
+        Supplier,
+      ]);
+      // await sequelize.sync({ force: true });
       return sequelize;
     },
   },
