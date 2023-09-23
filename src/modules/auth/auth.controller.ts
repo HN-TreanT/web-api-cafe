@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import RegisterInfo from "./dto/register-info";
 import { LocalAuthGuard } from "src/guards/local.guard";
 import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
 import { Roles } from "src/decorator/role.decorator";
+import InfoChangePassword from "./dto/info-change-password.dto";
+import { JwtRefreshGuard } from "src/guards/jwt-refresh.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -20,10 +22,20 @@ export class AuthController {
     return this.authService.signIn(req.user);
   }
 
-  @Get()
-  @Roles("A", "U")
-  @UseGuards(JwtAccessGuard, RolesGuard)
-  async get() {
-    return true;
+  @Post("/change-password")
+  async changePassword(@Body() data: InfoChangePassword) {
+    return this.authService.changePassword(data);
+  }
+
+  @Post("/refresh")
+  @UseGuards(JwtRefreshGuard)
+  async refresh(@Req() req: any) {
+    const user = req.user;
+    return this.authService.refresh(user);
+  }
+
+  @Get("/forget-password/:email")
+  async forgetPassword(@Param("email") email: string) {
+    return this.authService.forgetPassowrd(email);
   }
 }
