@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { EmployeeModule } from "../employee/employee.module";
 import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
@@ -10,17 +10,20 @@ import { LocalStrategy } from "src/strategies/local.strategy";
 import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import JwtAccessStrategy from "src/strategies/jwt-access.strategy";
 import JwtRefreshStrategy from "src/strategies/jwt_refresh.strategy";
+import { MailModule } from "src/helpers/mail/mail.module";
 
 @Module({
   imports: [
     EmployeeModule,
     PassportModule,
+    MailModule,
     JwtModule.register({
       global: true,
       secret: jwtContants.secret,
       signOptions: { expiresIn: "60s" },
     }),
   ],
+
   controllers: [AuthController],
   providers: [AuthService, ...authProviders, LocalStrategy, JwtAccessStrategy, JwtRefreshStrategy],
 })

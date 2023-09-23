@@ -13,6 +13,7 @@ import { StorageModule } from "./helpers/storage/storage.module";
 import { EmployeeModule } from "./modules/employee/employee.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { PositionModule } from "./modules/position/position.module";
+import { MailModule } from "./helpers/mail/mail.module";
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { PositionModule } from "./modules/position/position.module";
     EmployeeModule,
     AuthModule,
     PositionModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [
