@@ -28,12 +28,14 @@
 
 ##Cài đặt môi trường
 cài đặt mysql
+#
 `bash`
 Node ver 16.17.0
 
 
 ## Installation
 $ npm i -g @nestjs/cli
+#
 `bash`
 $ npm install
 
