@@ -14,6 +14,11 @@ import { EmployeeModule } from "./modules/employee/employee.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { PositionModule } from "./modules/position/position.module";
 import { MailModule } from "./helpers/mail/mail.module";
+import { WorkshiftModule } from "./modules/workshift/workshift.module";
+import { EmployeeWorkShiftModule } from "./modules/employee_workshift/employee_workshift.module";
+import { PromotionModule } from "./modules/promotion/promotion.module";
+import { ProductModule } from "./modules/product/product.module";
+import { CustomerModule } from "./modules/customer/customer.module";
 
 @Module({
   imports: [
@@ -43,6 +48,11 @@ import { MailModule } from "./helpers/mail/mail.module";
     AuthModule,
     PositionModule,
     MailModule,
+    WorkshiftModule,
+    EmployeeWorkShiftModule,
+    PromotionModule,
+    ProductModule,
+    CustomerModule,
   ],
   controllers: [AppController],
   providers: [

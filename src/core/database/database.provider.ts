@@ -27,7 +27,7 @@ export const databaseProviders = [
   {
     provide: SEQUELIZE,
     useFactory: async () => {
-      let config;
+      let config = databaseConfig[process.env.NODE_ENV || DEVELOPMENT];
       switch (process.env.NODE_ENV) {
         case DEVELOPMENT:
           config = databaseConfig.development;
@@ -64,7 +64,7 @@ export const databaseProviders = [
         Shipment,
         Supplier,
       ]);
-      // await sequelize.sync({ force: true });
+      // await sequelize.sync({});
       return sequelize;
     },
   },

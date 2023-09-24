@@ -5,10 +5,12 @@ import * as path from "path";
 import * as bodyParser from "body-parser";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { AllExceptionFilter } from "./filter/exception.filter";
+import { ValidationPipe } from "@nestjs/common";
 declare const module: any;
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors();
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.setGlobalPrefix("/api/v1");
   app.useStaticAssets(path.join(__dirname, "../public"));
 

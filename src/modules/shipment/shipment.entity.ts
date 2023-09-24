@@ -27,6 +27,7 @@ export class Shipment extends Model<Shipment> {
   id: number;
 
   @ForeignKey(() => Supplier)
+  @AllowNull
   @Column({
     type: DataType.BIGINT,
     allowNull: false,
@@ -34,6 +35,7 @@ export class Shipment extends Model<Shipment> {
   id_supplier: number;
 
   @ForeignKey(() => Employee)
+  @AllowNull
   @Column({
     type: DataType.BIGINT,
     allowNull: false,

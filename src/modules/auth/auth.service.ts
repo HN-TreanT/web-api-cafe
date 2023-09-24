@@ -19,9 +19,9 @@ export class AuthService {
   ) {}
   async validateUser(username: string, password: string) {
     const user = await this.authRepository.findOne({ where: { username: username } });
-    if (!user) throw new NotFoundException("user not found");
+    if (!user) throw new NotFoundException({ status: false, message: "user not found" });
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) throw new UnauthorizedException("password inccorect");
+    if (!isMatch) throw new UnauthorizedException({ status: false, message: "password inccorect" });
     if (user && isMatch) return user;
     return null;
   }
@@ -71,7 +71,7 @@ export class AuthService {
         email: email,
       },
     });
-    if (!user) throw new NotFoundException("email not exists");
+    if (!user) throw new NotFoundException({ message: "email not exists", status: false });
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let text: string = "";
     for (var i = 0; i < 5; i++) {

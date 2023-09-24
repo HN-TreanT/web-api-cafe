@@ -18,11 +18,13 @@ export class AllExceptionFilter implements ExceptionFilter {
     } else if (exception instanceof QueryFailedError) {
       statusCode = HttpStatus.BAD_REQUEST;
       responseBody = {
+        status: false,
         statusCode: statusCode,
         message: exception.message,
       };
     } else if (exception instanceof Error) {
       responseBody = {
+        status: false,
         statusCode: statusCode,
         message: exception.message,
       };

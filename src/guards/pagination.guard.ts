@@ -12,9 +12,6 @@ export class PaginationGuard implements CanActivate {
       limit: parseInt(size || 1000),
       offset: (page - 1) * size || 0,
     };
-    console.log("check page", page);
-    console.log("check size", size);
-    console.log(req.pagination);
     return true;
   }
 }

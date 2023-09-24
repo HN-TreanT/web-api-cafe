@@ -1,17 +1,6 @@
-import {
-  AllowNull,
-  AutoIncrement,
-  Column,
-  DataType,
-  Default,
-  IsEmail,
-  PrimaryKey,
-  Table,
-  Unique,
-  Model,
-  HasMany,
-} from "sequelize-typescript";
+import { AllowNull, AutoIncrement, Column, DataType, Default, IsEmail, PrimaryKey, Table, Unique, Model, HasMany } from "sequelize-typescript";
 import { Employee } from "../employee/employee.entity";
+import { Exclude } from "class-transformer";
 
 @Table({ tableName: "position" })
 export class Position extends Model<Position> {
@@ -21,6 +10,7 @@ export class Position extends Model<Position> {
   })
   id: string;
 
+  @Exclude()
   @Unique
   @Column({
     type: DataType.STRING,

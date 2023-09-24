@@ -29,6 +29,7 @@ export class Invoice extends Model<Invoice> {
   id: number;
 
   @ForeignKey(() => Employee)
+  @AllowNull
   @Column({
     type: DataType.BIGINT,
     allowNull: false,
