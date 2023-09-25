@@ -30,6 +30,7 @@ export class UseMaterial extends Model<UseMaterial> {
     type: DataType.BIGINT,
     allowNull: false,
     field: "id_product",
+    onDelete: "CASCADE",
   })
   id_product: number;
 
@@ -38,6 +39,7 @@ export class UseMaterial extends Model<UseMaterial> {
     type: DataType.BIGINT,
     allowNull: false,
     field: "id_material",
+    onDelete: "CASCADE",
   })
   id_material: number;
 

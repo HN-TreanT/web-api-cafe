@@ -27,6 +27,7 @@ export class EmployeeWorkShift extends Model<EmployeeWorkShift> {
   @ForeignKey(() => Workshift)
   @Column({
     type: DataType.BIGINT,
+    onDelete: "CASCADE",
   })
   id_workshift: number;
 

@@ -38,7 +38,7 @@ export class WorkshiftServices {
   async delete(id: number) {
     const workshift = await this.workshiftRepository.findByPk(id);
     if (!workshift) throw new NotFoundException({ message: "not found workshift", status: false });
-    await this.employeeWorkshiftService.deleteMany(id);
+    // await this.employeeWorkshiftService.deleteMany(id);
     await workshift.destroy();
     return true;
   }

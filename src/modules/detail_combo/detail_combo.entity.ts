@@ -30,6 +30,7 @@ export class DetailCombo extends Model<DetailCombo> {
     type: DataType.BIGINT,
     allowNull: false,
     field: "id_product",
+    onDelete: "CASCADE",
   })
   id_product: number;
 
@@ -38,6 +39,7 @@ export class DetailCombo extends Model<DetailCombo> {
     type: DataType.BIGINT,
     allowNull: false,
     field: "id_combo",
+    onDelete: "CASCADE",
   })
   id_combo: number;
 

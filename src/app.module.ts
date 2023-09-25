@@ -19,6 +19,8 @@ import { EmployeeWorkShiftModule } from "./modules/employee_workshift/employee_w
 import { PromotionModule } from "./modules/promotion/promotion.module";
 import { ProductModule } from "./modules/product/product.module";
 import { CustomerModule } from "./modules/customer/customer.module";
+import { TablefoodInvoiceModule } from "./modules/table_food_invoice/tablefood-invoice.module";
+import { TableModule } from "./modules/table_food/table-food.module";
 
 @Module({
   imports: [
@@ -53,6 +55,8 @@ import { CustomerModule } from "./modules/customer/customer.module";
     PromotionModule,
     ProductModule,
     CustomerModule,
+    TablefoodInvoiceModule,
+    TableModule,
   ],
   controllers: [AppController],
   providers: [
