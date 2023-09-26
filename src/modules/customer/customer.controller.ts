@@ -21,7 +21,6 @@ export class CustomerController {
       //   filter["email"] = { [Op.substring]: email };
       filter["email"] = email;
     }
-    console.log(filter["email"]);
     const data = await this.customerService.get(pagination, filter);
     return resposeSuccess(data);
   }

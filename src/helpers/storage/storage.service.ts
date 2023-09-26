@@ -58,8 +58,6 @@ export class StorageService {
     };
   }
   async deleteFile(nameFile: string) {
-    // const message = await this.storage.bucket(this.bucket).file(path).delete({ ignoreNotFound: true });
-    // console.log(message);
     const file = await this.storage.bucket(this.bucket).file(nameFile).delete({ ignoreNotFound: true });
     return true;
   }

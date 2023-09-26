@@ -23,6 +23,8 @@ import { TablefoodInvoiceModule } from "./modules/table_food_invoice/tablefood-i
 import { TableModule } from "./modules/table_food/table-food.module";
 import { InvoiceModule } from "./modules/invoice/invoice.module";
 import { ComboModule } from "./modules/combo/combo.module";
+import { CategoryController } from "./modules/category/category.controller";
+import { CategoryModule } from "./modules/category/category.module";
 
 @Module({
   imports: [
@@ -61,6 +63,7 @@ import { ComboModule } from "./modules/combo/combo.module";
     TableModule,
     InvoiceModule,
     ComboModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [

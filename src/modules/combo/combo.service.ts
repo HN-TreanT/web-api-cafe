@@ -1,7 +1,9 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { COMBO_REPOSITORY } from "src/constants/repository_enum";
 import { Combo } from "./combo.entity";
 import { PagedData } from "src/models/PagedData";
+import { ComboCreate } from "./dto/combo-create.dto";
+import { ComboEdit } from "./dto/combo-edit.dto";
 
 @Injectable()
 export class ComboService {
@@ -21,5 +23,30 @@ export class ComboService {
       data: rows,
     };
     return data;
+  }
+
+  async getById(id: number): Promise<Combo> {
+    const combo = await this.comboRepository.findByPk(id);
+    if (!combo) throw new NotFoundException({ message: "not found combo", status: false });
+    return combo;
+  }
+
+  async create(infoCreate: ComboCreate): Promise<Combo> {
+    return await this.comboRepository.create(infoCreate);
+  }
+
+  async edit(id: number, infoEdit: ComboEdit): Promise<Combo> {
+    const combo = await this.comboRepository.findByPk(id);
+    if (!combo) throw new NotFoundException({ message: "not found combo", status: false });
+    return await combo.update(infoEdit);
+  }
+
+  async deleteById(id: number) {
+    await this.comboRepository.destroy({
+      where: {
+        id: id,
+      },
+    });
+    return true;
   }
 }
