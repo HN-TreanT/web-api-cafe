@@ -21,6 +21,8 @@ import { ProductModule } from "./modules/product/product.module";
 import { CustomerModule } from "./modules/customer/customer.module";
 import { TablefoodInvoiceModule } from "./modules/table_food_invoice/tablefood-invoice.module";
 import { TableModule } from "./modules/table_food/table-food.module";
+import { InvoiceModule } from "./modules/invoice/invoice.module";
+import { ComboModule } from "./modules/combo/combo.module";
 
 @Module({
   imports: [
@@ -57,6 +59,8 @@ import { TableModule } from "./modules/table_food/table-food.module";
     CustomerModule,
     TablefoodInvoiceModule,
     TableModule,
+    InvoiceModule,
+    ComboModule,
   ],
   controllers: [AppController],
   providers: [
