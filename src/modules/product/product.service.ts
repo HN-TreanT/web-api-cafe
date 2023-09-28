@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { PRODUCT_REPOSITORY } from "src/constants/repository_enum";
+import { PRODUCT_REPOSITORY, USE_MATERIAL_REPOSITORY } from "src/constants/repository_enum";
 import { Product } from "./product.entity";
 import { PagedData } from "src/models/PagedData";
 import { Category } from "../category/category.entity";
@@ -8,16 +8,29 @@ import { Material } from "../material/material.entity";
 import { ProductCreate } from "./dto/product-create.dto";
 import { ProductEdit } from "./dto/product-edit.dto";
 import { StorageService } from "src/helpers/storage/storage.service";
+import { ProductFilter } from "./dto/product-filter.dto";
+import { ProductOrder } from "./dto/product-order.dto";
+import { Op } from "sequelize";
 
 @Injectable()
 export class ProductServices {
   constructor(
     @Inject(PRODUCT_REPOSITORY) private readonly productRepository: typeof Product,
+    @Inject(USE_MATERIAL_REPOSITORY) private readonly useMaterialRepository: typeof UseMaterial,
     private readonly storageSerice: StorageService
   ) {}
-  async get(pagination: any, filter: any): Promise<PagedData<Product>> {
+  async get(pagination: any, filter: ProductFilter, order: ProductOrder): Promise<PagedData<Product>> {
+    let filterProduct: any = {};
+    let orderProduct: any = [];
+    if (filter.id_category) {
+      filterProduct.id_category = filter.id_category;
+    }
+    if (filter.name) filterProduct.name = { [Op.substring]: filter.name };
+    if (order.order_name) orderProduct = [...orderProduct, ["name", `${order.order_name}`]];
+    if (order.order_price) orderProduct = [...orderProduct, ["price", `${order.order_price}`]];
     const { count, rows } = await this.productRepository.findAndCountAll({
-      where: { ...filter },
+      where: { ...filterProduct },
+      order: [...orderProduct],
       ...pagination,
       include: [
         {
@@ -58,6 +71,13 @@ export class ProductServices {
 
   async create(infoCreate: ProductCreate, file: Express.Multer.File): Promise<Product> {
     const product = await this.productRepository.create(infoCreate);
+    const use_materials = infoCreate.lst_use_material.map((item) => {
+      return {
+        ...item,
+        id_product: product.id,
+      };
+    });
+    await this.useMaterialRepository.bulkCreate(use_materials);
     if (file) {
       const upload = await this.storageSerice.uploadFile(file, "");
       product.image = upload.publicUrl;
@@ -67,7 +87,21 @@ export class ProductServices {
 
   async edit(id: number, infoEdit: ProductEdit, file: Express.Multer.File): Promise<Product> {
     const product = await this.productRepository.findByPk(id);
+
     if (!product) throw new NotFoundException({ message: "not found product", status: false });
+    const use_materials = infoEdit.lst_use_material.map((item) => {
+      return {
+        ...item,
+        id_product: product.id,
+      };
+    });
+    await this.useMaterialRepository.destroy({
+      where: {
+        id_product: product.id,
+      },
+    });
+    await this.useMaterialRepository.bulkCreate(use_materials);
+
     if (file) {
       await this.storageSerice.deleteFile(product.image.split("/")[4]);
       const updload = await this.storageSerice.uploadFile(file, "");

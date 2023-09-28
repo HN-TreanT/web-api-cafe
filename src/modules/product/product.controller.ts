@@ -4,15 +4,18 @@ import { PaginationGuard } from "src/guards/pagination.guard";
 import { resposeSuccess } from "src/helpers/Response";
 import { ProductEdit } from "./dto/product-edit.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { ProductFilter } from "./dto/product-filter.dto";
+import { ProductOrder } from "./dto/product-order.dto";
+import { ProductCreate } from "./dto/product-create.dto";
 
 @Controller("product")
 export class ProductController {
   constructor(private readonly productService: ProductServices) {}
   @Get()
   @UseGuards(PaginationGuard)
-  async get(@Req() req: any) {
+  async get(@Req() req: any, @Query() filter: ProductFilter, @Query() order?: ProductOrder) {
     const pagination = req.pagination;
-    const data = await this.productService.get(pagination, {});
+    const data = await this.productService.get(pagination, filter, order);
     return resposeSuccess(data);
   }
 
@@ -24,7 +27,7 @@ export class ProductController {
 
   @UseInterceptors(FileInterceptor("image"))
   @Post("")
-  async create(@Body() infoCreate: any, @UploadedFile() image: Express.Multer.File) {
+  async create(@Body() infoCreate: ProductCreate, @UploadedFile() image: Express.Multer.File) {
     const data = await this.productService.create(infoCreate, image);
     return resposeSuccess(data);
   }

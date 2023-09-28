@@ -4,6 +4,7 @@ import { PaginationGuard } from "src/guards/pagination.guard";
 import { Op } from "sequelize";
 import { resposeSuccess } from "src/helpers/Response";
 import { ComboCreate } from "./dto/combo-create.dto";
+import { ComboEdit } from "./dto/combo-edit.dto";
 
 @Controller("combo")
 export class ComboController {
@@ -34,7 +35,7 @@ export class ComboController {
   }
 
   @Put("/:id")
-  async edit(@Param("id") id: number, @Body() infoEdit: ComboCreate) {
+  async edit(@Param("id") id: number, @Body() infoEdit: ComboEdit) {
     const data = await this.comboService.edit(id, infoEdit);
     return resposeSuccess(data);
   }

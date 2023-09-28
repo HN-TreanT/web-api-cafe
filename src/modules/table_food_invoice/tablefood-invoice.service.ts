@@ -11,9 +11,6 @@ export class TablefoodInoviceService {
   @Inject(TABLEFOOD_INVOICE_REPOSITORY) private readonly _repository: typeof TableFoodInvoice;
   async get(pagination: any, filter: any): Promise<PagedData<TableFoodInvoice>> {
     const { count, rows } = await this._repository.findAndCountAll({
-      attributes: {
-        exclude: ["password"],
-      },
       where: { ...filter },
       ...pagination,
     });

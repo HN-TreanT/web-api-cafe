@@ -25,6 +25,13 @@ import { InvoiceModule } from "./modules/invoice/invoice.module";
 import { ComboModule } from "./modules/combo/combo.module";
 import { CategoryController } from "./modules/category/category.controller";
 import { CategoryModule } from "./modules/category/category.module";
+import { DetailComboModule } from "./modules/detail_combo/detail-combo.module";
+import { MaterialSerivce } from "./modules/material/material.service";
+import { MaterialModule } from "./modules/material/material.module";
+import { UserMaterialModule } from "./modules/use_material/use_material.module";
+import { SupplierModule } from "./modules/supplier/supplier.module";
+import { ShipmentModule } from "./modules/shipment/shipment.module";
+import { DetailShipmentModule } from "./modules/detail_shipment/detail-shipment.module";
 
 @Module({
   imports: [
@@ -64,6 +71,12 @@ import { CategoryModule } from "./modules/category/category.module";
     InvoiceModule,
     ComboModule,
     CategoryModule,
+    DetailComboModule,
+    MaterialModule,
+    UserMaterialModule,
+    SupplierModule,
+    ShipmentModule,
+    DetailShipmentModule,
   ],
   controllers: [AppController],
   providers: [

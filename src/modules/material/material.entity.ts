@@ -50,9 +50,9 @@ export class Material extends Model<Material> {
   })
   unit: string;
 
+  @AllowNull
   @Column({
     type: DataType.DATE,
-    allowNull: false,
     field: "expriation_date",
   })
   expriation_date: Date;

@@ -1,0 +1,62 @@
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { PagedData } from "src/models/PagedData";
+import { DetailShipment } from "./detail_shipment.enitty";
+import { DETAIL_SHIPMENT_REPOSITORY, SHIPMENT_REPOSITORY } from "src/constants/repository_enum";
+import { DetailShipmentCreate } from "./dto/detail-shipment-create.dto";
+import { DetailShipmentEdit } from "./dto/detail-shipment-edit";
+import { DetailShipmentFilter } from "./dto/detail-shipment-filter";
+import { Op } from "sequelize";
+import { Material } from "../material/material.entity";
+import { DetailShipmentOrder } from "./dto/detail-shipment-order";
+
+@Injectable()
+export class DetailShipmentService {
+  constructor(@Inject(DETAIL_SHIPMENT_REPOSITORY) private readonly detailShipmentRepository: typeof DetailShipment) {}
+  async get(pagination: any, filter: DetailShipmentFilter, order: DetailShipmentOrder): Promise<PagedData<DetailShipment>> {
+    let filterData: any = {};
+    let filterWithMaterial: any = {};
+    let orderData: any = [];
+    if (filter.id_shipment) filterData.id_shipment = filter.id_shipment;
+    if (filter.name_material) filterWithMaterial.name = { [Op.substring]: filter.name_material };
+    if (order.order_amount) orderData = [...orderData, ["amount", `${order.order_amount}`]];
+    if (order.order_price) orderData = [...orderData, ["price", `${order.order_price}`]];
+    const { count, rows } = await this.detailShipmentRepository.findAndCountAll({
+      where: { ...filterData },
+      order: [...orderData],
+      ...pagination,
+      include: [{ model: Material, where: { ...filterWithMaterial } }],
+    });
+    const pageNumber = pagination.offset / pagination.limit + 1;
+    const data = {
+      CurrentPage: pageNumber,
+      TotalPage: count,
+      CanNext: pageNumber < count,
+      CanBack: pageNumber > 1,
+      data: rows,
+    };
+    return data;
+  }
+
+  async getById(id: number): Promise<DetailShipment> {
+    const detail_shipment = await this.detailShipmentRepository.findByPk(id);
+    if (!detail_shipment) throw new NotFoundException({ message: "not found", status: false });
+    return detail_shipment;
+  }
+
+  async create(infoCreate: DetailShipmentCreate): Promise<DetailShipment> {
+    return await this, this.detailShipmentRepository.create(infoCreate);
+  }
+
+  async edit(id: number, infoEdit: DetailShipmentEdit): Promise<DetailShipment> {
+    const detail_shipment = await this.detailShipmentRepository.findByPk(id);
+    if (!detail_shipment) throw new NotFoundException({ message: "not found", status: false });
+    return detail_shipment.update(infoEdit);
+  }
+
+  async delete(id: number) {
+    const detail_shipment = await this.detailShipmentRepository.findByPk(id);
+    if (!detail_shipment) throw new NotFoundException({ message: "not found", status: false });
+    await detail_shipment.destroy();
+    return true;
+  }
+}

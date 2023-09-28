@@ -42,6 +42,12 @@ export class Shipment extends Model<Shipment> {
   })
   id_employee: number;
 
+  @Default(0)
+  @Column({
+    type: DataType.FLOAT,
+  })
+  price: number;
+
   @HasMany(() => DetailShipment)
   detail_shipments: DetailShipment[];
 
