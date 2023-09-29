@@ -6,9 +6,11 @@ import * as bodyParser from "body-parser";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { AllExceptionFilter } from "./filter/exception.filter";
 import { ValidationPipe } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 declare const module: any;
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const configService = app.get(ConfigService);
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
@@ -17,8 +19,10 @@ async function bootstrap() {
 
   app.use(bodyParser.json({}));
   app.use(bodyParser.urlencoded({ extended: true }));
-  await app.listen(8080, async () => {
-    console.log(`The server is running on ${8080} port: http://localhost:${8080}`);
+
+  const port = configService.get<number>("PORT");
+  await app.listen(port, async () => {
+    console.log(`The server is running on ${port} port: http://localhost:${port}`);
   });
   if (module.hot) {
     module.hot.accept();
