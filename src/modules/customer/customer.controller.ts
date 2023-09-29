@@ -1,6 +1,6 @@
 import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards, UseInterceptors } from "@nestjs/common";
 import { CustomerService } from "./customer.service";
-import { resposeSuccess } from "src/helpers/Response";
+
 import { CustomerCreate } from "./dto/customer-create.dto";
 import { PaginationGuard } from "src/guards/pagination.guard";
 import { CustomerEdit } from "./dto/customer-edit.dto";
@@ -22,29 +22,29 @@ export class CustomerController {
       filter["email"] = email;
     }
     const data = await this.customerService.get(pagination, filter);
-    return resposeSuccess(data);
+    return data;
   }
 
   @Get("/:id")
   async getById(@Param("id") id: number) {
     const data = await this.customerService.getById(id);
-    return resposeSuccess(data);
+    return data;
   }
 
   @Post()
   async create(@Body() promotionCreate: CustomerCreate) {
     const data = await this.customerService.create(promotionCreate);
-    return resposeSuccess(data);
+    return data;
   }
 
   @Put("/:id")
   async edit(@Param("id") id: number, @Body() promotionEdit: CustomerEdit) {
     const data = await this.customerService.edit(id, promotionEdit);
-    return resposeSuccess(data);
+    return data;
   }
   @Delete("/:id")
   async deleteById(@Param("id") id: number) {
     await this.customerService.delete(id);
-    return resposeSuccess();
+    return true;
   }
 }

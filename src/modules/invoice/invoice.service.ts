@@ -9,8 +9,9 @@ import { Promotion } from "../promotion/promotion.entity";
 import { Customer } from "../customer/customer.entity";
 import { TableFoodInvoice } from "../table_food_invoice/table_food_invoice.entity";
 import { FilterDto } from "./dto/filter.dto";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { OrderInvoiceDto } from "./dto/order.dto";
+import { tranform_date } from "src/common/tranform-date";
 
 @Injectable()
 export class InvoiceService {

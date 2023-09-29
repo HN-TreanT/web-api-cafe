@@ -27,6 +27,7 @@ export class AuthService {
   }
 
   async register(registerInfo: RegisterInfo): Promise<Employee> {
+    console.log(registerInfo);
     const hashPassword = await bcrypt.hash(registerInfo.password, 10);
     registerInfo.password = hashPassword;
     if (!registerInfo.id_position) {

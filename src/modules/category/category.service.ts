@@ -3,6 +3,7 @@ import { CATEGORY_REPOSITORY } from "src/constants/repository_enum";
 import { Category } from "./category.entity";
 import { PagedData } from "src/models/PagedData";
 import { CategoryDto } from "./dto/category-dto.dto";
+import { tranform_date } from "src/common/tranform-date";
 
 @Injectable()
 export class CategoryService {
@@ -26,7 +27,7 @@ export class CategoryService {
   }
 
   async getById(id: number): Promise<Category> {
-    const category = await this.categoryRepository.findByPk(id);
+    const category = await this.categoryRepository.findByPk(id, {});
     if (!category) throw new NotFoundException({ message: "not found category", status: false });
     return category;
   }

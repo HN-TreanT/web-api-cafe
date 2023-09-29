@@ -5,9 +5,10 @@ import { DETAIL_SHIPMENT_REPOSITORY, SHIPMENT_REPOSITORY } from "src/constants/r
 import { DetailShipmentCreate } from "./dto/detail-shipment-create.dto";
 import { DetailShipmentEdit } from "./dto/detail-shipment-edit";
 import { DetailShipmentFilter } from "./dto/detail-shipment-filter";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { Material } from "../material/material.entity";
 import { DetailShipmentOrder } from "./dto/detail-shipment-order";
+import { tranform_date } from "src/common/tranform-date";
 
 @Injectable()
 export class DetailShipmentService {
@@ -38,7 +39,7 @@ export class DetailShipmentService {
   }
 
   async getById(id: number): Promise<DetailShipment> {
-    const detail_shipment = await this.detailShipmentRepository.findByPk(id);
+    const detail_shipment = await this.detailShipmentRepository.findByPk(id, {});
     if (!detail_shipment) throw new NotFoundException({ message: "not found", status: false });
     return detail_shipment;
   }

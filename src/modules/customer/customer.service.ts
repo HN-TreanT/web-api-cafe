@@ -4,6 +4,7 @@ import { Customer } from "./customer.entity";
 import { PagedData } from "src/models/PagedData";
 import { CustomerCreate } from "./dto/customer-create.dto";
 import { CustomerEdit } from "./dto/customer-edit.dto";
+import { tranform_date } from "src/common/tranform-date";
 
 @Injectable()
 export class CustomerService {
@@ -25,7 +26,7 @@ export class CustomerService {
   }
 
   async getById(id: number): Promise<Customer> {
-    const promotion = await this.customerRepository.findByPk(id);
+    const promotion = await this.customerRepository.findByPk(id, {});
     if (!promotion) throw new NotFoundException({ message: "not found customer", status: false });
     return promotion;
   }

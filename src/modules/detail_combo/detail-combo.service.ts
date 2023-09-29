@@ -4,6 +4,7 @@ import { DetailCombo } from "./detail_combo.entity";
 import { PagedData } from "src/models/PagedData";
 import { DetailComboCreate } from "./dto/detailcobom-create.dto";
 import { DetailComboEdit } from "./dto/detailcombo-edit.dto";
+import { tranform_date } from "src/common/tranform-date";
 
 @Injectable()
 export class DetailComboService {
@@ -25,7 +26,7 @@ export class DetailComboService {
   }
 
   async getById(id: number): Promise<DetailCombo> {
-    const detail_combo = await this.detailComboRepository.findByPk(id);
+    const detail_combo = await this.detailComboRepository.findByPk(id, {});
     if (!detail_combo) throw new NotFoundException({ message: "not foun", status: false });
     return detail_combo;
   }

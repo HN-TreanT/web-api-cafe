@@ -13,7 +13,7 @@ import {
   ForeignKey,
   BelongsTo,
 } from "sequelize-typescript";
-import { InventoryShortage } from "../inventory_shortage/inventory_shortage.entity";
+import { DetailCheckInventory } from "../detail-check-inventory/detail_check-inventory.entity";
 import { DetailShipment } from "../detail_shipment/detail_shipment.enitty";
 import { UseMaterial } from "../use_material/use_material.entity";
 
@@ -57,8 +57,8 @@ export class Material extends Model<Material> {
   })
   expriation_date: Date;
 
-  @HasMany(() => InventoryShortage)
-  inventory_shortages: InventoryShortage[];
+  @HasMany(() => DetailCheckInventory)
+  detail_check_inventories: DetailCheckInventory[];
   @HasMany(() => DetailShipment)
   detail_shipments: DetailShipment[];
   @HasMany(() => UseMaterial)

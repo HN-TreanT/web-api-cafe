@@ -3,7 +3,7 @@
     "username": "admin",
     "password": "hnam23012002",
     "database": "cafe",
-    "host": "localhost",
+    "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "test": {

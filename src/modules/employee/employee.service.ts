@@ -7,6 +7,10 @@ import { EmployeeWorkShift } from "../employee_workshift/employee_workshift.enti
 import { Workshift } from "../workshift/workshift.entity";
 import { Position } from "../position/position.entity";
 import { EmployeeWorkShiftService } from "../employee_workshift/employee_workshift.service";
+import { tranform_date } from "src/common/tranform-date";
+import { Sequelize } from "sequelize";
+import { EmployeeFilter } from "./dto/employee-filter.dto";
+import { Op } from "sequelize";
 
 @Injectable()
 export class EmployeeService {
@@ -15,12 +19,24 @@ export class EmployeeService {
     private readonly employeeWorkshiftService: EmployeeWorkShiftService
   ) {}
 
-  async get(pagination: any, filter: any): Promise<PagedData<Employee>> {
+  async get(pagination: any, filter: EmployeeFilter): Promise<PagedData<Employee>> {
+    let filterData: any = {};
+    if (filter.search) {
+      filterData[Op.or] = {
+        name: { [Op.substring]: filter.search },
+        email: filter.search,
+        phone_number: filter.search,
+        address: { [Op.substring]: filter.search },
+      };
+    }
+    if (filter.id_position) {
+      filterData.id_position = filter.id_position;
+    }
     const { count, rows } = await this.employeeRepository.findAndCountAll({
       attributes: {
         exclude: ["password"],
       },
-      where: { ...filter },
+      where: { ...filterData },
       ...pagination,
       include: [
         {

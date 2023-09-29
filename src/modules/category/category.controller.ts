@@ -3,7 +3,7 @@ import { CategoryService } from "./category.service";
 import { UseGuards } from "@nestjs/common";
 import { PaginationGuard } from "src/guards/pagination.guard";
 import { Query } from "@nestjs/common";
-import { resposeSuccess } from "src/helpers/Response";
+
 import { Op } from "sequelize";
 import { CategoryDto } from "./dto/category-dto.dto";
 
@@ -19,29 +19,29 @@ export class CategoryController {
       filter["name"] = { [Op.substring]: search };
     }
     const data = await this.categoryService.get(pagination, filter);
-    return resposeSuccess(data);
+    return data;
   }
 
   @Get("/:id")
   async getById(@Param("id") id: number) {
     const data = await this.categoryService.getById(id);
-    return resposeSuccess(data);
+    return data;
   }
 
   @Post()
   async create(@Body() infoCreate: CategoryDto) {
     const data = await this.categoryService.create(infoCreate);
-    return resposeSuccess(data);
+    return data;
   }
 
   @Put("/:id")
   async edit(@Param("id") id: number, @Body() infoEdit: CategoryDto) {
     const data = await this.categoryService.edit(id, infoEdit);
-    return resposeSuccess(data);
+    return data;
   }
   @Delete("/:id")
   async deleteById(@Param("id") id: number) {
     await this.categoryService.deleteById(id);
-    return resposeSuccess();
+    return true;
   }
 }

@@ -11,6 +11,9 @@ export default class RegisterInfo {
   @IsEmail()
   email: string;
 
+  @IsNotEmpty()
+  name: string;
+
   birthday: Date;
 
   address: string;

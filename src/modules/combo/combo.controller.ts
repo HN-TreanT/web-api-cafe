@@ -2,7 +2,7 @@ import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Param, Post,
 import { ComboService } from "./combo.service";
 import { PaginationGuard } from "src/guards/pagination.guard";
 import { Op } from "sequelize";
-import { resposeSuccess } from "src/helpers/Response";
+
 import { ComboCreate } from "./dto/combo-create.dto";
 import { ComboEdit } from "./dto/combo-edit.dto";
 
@@ -19,29 +19,29 @@ export class ComboController {
     }
     console.log(filter["email"]);
     const data = await this.comboService.get(pagination, filter);
-    return resposeSuccess(data);
+    return data;
   }
 
   @Get("/:id")
   async getById(@Param("id") id: number) {
     const data = await this.comboService.getById(id);
-    return resposeSuccess(data);
+    return data;
   }
 
   @Post()
   async create(@Body() infoCreate: ComboCreate) {
     const data = await this.comboService.create(infoCreate);
-    return resposeSuccess(data);
+    return data;
   }
 
   @Put("/:id")
   async edit(@Param("id") id: number, @Body() infoEdit: ComboEdit) {
     const data = await this.comboService.edit(id, infoEdit);
-    return resposeSuccess(data);
+    return data;
   }
   @Delete("/:id")
   async deleteById(@Param("id") id: number) {
     await this.comboService.deleteById(id);
-    return resposeSuccess();
+    return true;
   }
 }

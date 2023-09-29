@@ -6,7 +6,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CacheModule } from "@nestjs/cache-manager";
 import { BullModule } from "@nestjs/bull";
 import * as redisStore from "cache-manager-redis-store";
-import { APP_FILTER } from "@nestjs/core";
+import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
 import { AllExceptionFilter } from "./filter/exception.filter";
 import { LoggerModule } from "./logger/logger.module";
 import { StorageModule } from "./helpers/storage/storage.module";
@@ -32,6 +32,10 @@ import { UserMaterialModule } from "./modules/use_material/use_material.module";
 import { SupplierModule } from "./modules/supplier/supplier.module";
 import { ShipmentModule } from "./modules/shipment/shipment.module";
 import { DetailShipmentModule } from "./modules/detail_shipment/detail-shipment.module";
+import { CheckInventory } from "./modules/check_inventory/check_inventory";
+import { CheckInventoryModule } from "./modules/check_inventory/check-inventory.module";
+import { TransformInterceptor } from "./Interceptors/tranform.interceptor";
+import { DTCheckInventorModule } from "./modules/detail-check-inventory/detail-check-inventor.module";
 
 @Module({
   imports: [
@@ -77,6 +81,8 @@ import { DetailShipmentModule } from "./modules/detail_shipment/detail-shipment.
     SupplierModule,
     ShipmentModule,
     DetailShipmentModule,
+    CheckInventoryModule,
+    DTCheckInventorModule,
   ],
   controllers: [AppController],
   providers: [
@@ -84,6 +90,10 @@ import { DetailShipmentModule } from "./modules/detail_shipment/detail-shipment.
     {
       provide: APP_FILTER,
       useClass: AllExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
     },
   ],
 })

@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  ArgumentMetadata,
-  BadRequestException,
-  ValidationPipe,
-  UnprocessableEntityException,
-} from "@nestjs/common";
+import { Injectable, ArgumentMetadata, BadRequestException, ValidationPipe, UnprocessableEntityException } from "@nestjs/common";
 
 @Injectable()
 export class ValidateInputPipe extends ValidationPipe {

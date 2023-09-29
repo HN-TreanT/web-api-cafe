@@ -1,22 +1,8 @@
-import {
-  AllowNull,
-  AutoIncrement,
-  Column,
-  DataType,
-  Default,
-  IsEmail,
-  PrimaryKey,
-  Table,
-  Unique,
-  Model,
-  HasMany,
-  ForeignKey,
-  BelongsTo,
-} from "sequelize-typescript";
+import { AutoIncrement, Column, DataType, PrimaryKey, Table, Model, Default, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Material } from "../material/material.entity";
-
-@Table({ tableName: "inventory_shortage" })
-export class InventoryShortage extends Model<InventoryShortage> {
+import { CheckInventory } from "../check_inventory/check_inventory";
+@Table({ tableName: "detail_check_inventory" })
+export class DetailCheckInventory extends Model<DetailCheckInventory> {
   @PrimaryKey
   @AutoIncrement
   @Column({
@@ -28,13 +14,17 @@ export class InventoryShortage extends Model<InventoryShortage> {
   @Column({
     type: DataType.BIGINT,
     allowNull: false,
+    onDelete: "CASCADE",
   })
   id_material: number;
 
+  @ForeignKey(() => CheckInventory)
   @Column({
-    type: DataType.DATE,
+    type: DataType.BIGINT,
+    allowNull: false,
+    onDelete: "CASCADE",
   })
-  time_check: Date;
+  id_detail_check: number;
 
   @Default(0)
   @Column({
@@ -55,4 +45,6 @@ export class InventoryShortage extends Model<InventoryShortage> {
   shortage_count: number;
   @BelongsTo(() => Material)
   material: Material;
+  @BelongsTo(() => CheckInventory)
+  check_inventory: CheckInventory;
 }

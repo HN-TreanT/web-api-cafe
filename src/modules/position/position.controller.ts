@@ -1,4 +1,16 @@
-import { Body, ClassSerializerInterceptor, Controller, Get, Inject, Post, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  UseInterceptors,
+} from "@nestjs/common";
 import { POSITION_REPOSITORY } from "src/constants/repository_enum";
 import { Position } from "./position.entity";
 import { PositionCreate } from "./dto/position-create.dto";
@@ -15,12 +27,28 @@ export class PositionController {
   async get() {
     const { count, rows } = await this.positionRepository.findAndCountAll<Position>({
       where: {},
-      include: [
-        {
-          model: Employee,
-        },
-      ],
     });
     return rows;
+  }
+
+  @Get("/:id")
+  async getById(@Param("id") id: string) {
+    const role = await this.positionRepository.findByPk(id);
+    if (!role) throw new NotFoundException({ message: "not found role", status: false });
+    return role;
+  }
+
+  // @Put("/:id")
+  // async edit(@Param("id") id: number) {
+  //   const role = await this.positionRepository.findByPk(id);
+  //   if (!role) throw new NotFoundException({ message: "not found role", status: false });
+  //   return role;
+  // }
+  @Delete("/:id")
+  async deleteById(@Param("id") id: string) {
+    const role = await this.positionRepository.findByPk(id);
+    if (!role) throw new NotFoundException({ message: "not found role", status: false });
+    await role.destroy();
+    return true;
   }
 }

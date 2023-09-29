@@ -42,6 +42,12 @@ export class Employee extends Model<Employee> {
   })
   password: string;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  name: string;
+
   @Unique
   @IsEmail
   @Column({

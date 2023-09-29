@@ -3,6 +3,7 @@ import { EmployeeWfCreate } from "src/modules/employee_workshift/dto/employee-wo
 
 export default class EmployeeUpdate {
   // @IsEmail()
+  name: string;
   email: string;
 
   birthday: Date;

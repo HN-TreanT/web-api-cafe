@@ -2,7 +2,7 @@ import { Inject, Injectable, NotFoundException, Req } from "@nestjs/common";
 import { DETAIL_SHIPMENT_REPOSITORY, MATERIAL_REPOSITORY } from "src/constants/repository_enum";
 import { Material } from "./material.entity";
 import { PagedData } from "src/models/PagedData";
-import { InventoryShortage } from "../inventory_shortage/inventory_shortage.entity";
+import { DetailCheckInventory } from "../detail-check-inventory/detail_check-inventory.entity";
 import { MaterialCreate } from "./dto/material-create.dto";
 import { MaterialEdit } from "./dto/material-edit.dto";
 import { Op } from "sequelize";
@@ -43,7 +43,7 @@ export class MaterialSerivce {
     const material = await this.materialRepository.findByPk(id, {
       include: [
         {
-          model: InventoryShortage,
+          model: DetailCheckInventory,
         },
       ],
     });

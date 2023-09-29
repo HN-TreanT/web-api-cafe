@@ -1,4 +1,4 @@
-import { NestFactory } from "@nestjs/core";
+import { NestFactory, Reflector } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ValidateInputPipe } from "./pipe/validate.pipe";
 import * as path from "path";
@@ -11,6 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+
   app.setGlobalPrefix("/api/v1");
   app.useStaticAssets(path.join(__dirname, "../public"));
 

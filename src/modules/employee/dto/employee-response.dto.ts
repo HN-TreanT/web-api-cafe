@@ -5,6 +5,7 @@ export default class EmployeeReponse {
   username: string;
   @Exclude()
   password: string;
+  name: string;
   email: string;
   birthday: Date;
   address: string;
