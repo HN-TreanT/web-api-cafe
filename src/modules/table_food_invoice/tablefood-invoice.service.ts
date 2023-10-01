@@ -4,7 +4,6 @@ import { TableFoodInvoice } from "./table_food_invoice.entity";
 import { PagedData } from "src/models/PagedData";
 import { TblInvoiceCreate } from "./dto/tbf-invoice-create";
 import { TblInvoiceEdit } from "./dto/tbl-inovice-edit.dto";
-import { TableFood } from "../table_food/table_food.entity";
 
 @Injectable()
 export class TablefoodInoviceService {

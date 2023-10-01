@@ -4,7 +4,6 @@ import { TableFood } from "./table_food.entity";
 import { PagedData } from "src/models/PagedData";
 import { TableFoodDto } from "./dto/table-food.dto";
 import { TablefoodInoviceService } from "../table_food_invoice/tablefood-invoice.service";
-import { TableFoodInvoice } from "../table_food_invoice/table_food_invoice.entity";
 
 @Injectable()
 export class TableFoodService {

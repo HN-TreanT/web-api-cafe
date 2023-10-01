@@ -10,14 +10,7 @@ import { Op } from "sequelize";
 export class SupplierSerivce {
   constructor(@Inject(SUPPLIER_REPOSITORY) private readonly supplierRepository: typeof Supplier) {}
   async get(pagination: any, search: string): Promise<PagedData<Supplier>> {
-    let filter: any = {
-      // [Op.or]: {
-      //   name: { [Op.substring]: search },
-      //   email: search,
-      //   phone_number: search,
-      //   address: { [Op.substring]: search },
-      // },
-    };
+    let filter: any = {};
 
     if (search) {
       filter[Op.or] = {

@@ -4,6 +4,7 @@ import { UseMaterial } from "./use_material.entity";
 import { PagedData } from "src/models/PagedData";
 import { UseMaterialCreate } from "./dto/use-material-create.dto";
 import { UseMaterialEdit } from "./dto/use-material-edit.dto";
+import { Worker } from "cluster";
 
 @Injectable()
 export class UseMaterialService {

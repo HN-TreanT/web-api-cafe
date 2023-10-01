@@ -6,7 +6,6 @@ import { DTCheckInventoryCreate } from "./dto/dt-check-inventory-create.dto";
 import { DTCheckInventoryEdit } from "./dto/dt-check-inventory-edit";
 import { Material } from "../material/material.entity";
 import { CheckInventory } from "../check_inventory/check_inventory";
-
 @Injectable()
 export class DtCheckInventorService {
   constructor(@Inject(DETAIL_CHECK_INVENTORY_REPOSITORY) private readonly _repository: typeof DetailCheckInventory) {}

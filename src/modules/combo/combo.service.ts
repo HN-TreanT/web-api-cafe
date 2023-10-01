@@ -6,8 +6,6 @@ import { ComboCreate } from "./dto/combo-create.dto";
 import { ComboEdit } from "./dto/combo-edit.dto";
 import { DetailCombo } from "../detail_combo/detail_combo.entity";
 import { Product } from "../product/product.entity";
-import { DetailComboService } from "../detail_combo/detail-combo.service";
-import { tranform_date } from "src/common/tranform-date";
 
 @Injectable()
 export class ComboService {

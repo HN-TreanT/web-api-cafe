@@ -4,8 +4,6 @@ import { Customer } from "./customer.entity";
 import { PagedData } from "src/models/PagedData";
 import { CustomerCreate } from "./dto/customer-create.dto";
 import { CustomerEdit } from "./dto/customer-edit.dto";
-import { tranform_date } from "src/common/tranform-date";
-
 @Injectable()
 export class CustomerService {
   constructor(@Inject(CUSTOMER_REPOSITORY) private readonly customerRepository: typeof Customer) {}

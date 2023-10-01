@@ -8,7 +8,6 @@ import { MaterialEdit } from "./dto/material-edit.dto";
 import { Op } from "sequelize";
 import { MaterialOrder } from "./dto/material-order.dto";
 import { DetailShipment } from "../detail_shipment/detail_shipment.enitty";
-
 @Injectable()
 export class MaterialSerivce {
   constructor(

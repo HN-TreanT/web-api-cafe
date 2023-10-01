@@ -6,7 +6,6 @@ import { ShipmentDto } from "./dto/shipment.dto";
 import { Supplier } from "../supplier/supplier.entity";
 import { Employee } from "../employee/employee.entity";
 import { DetailShipment } from "../detail_shipment/detail_shipment.enitty";
-import { Material } from "../material/material.entity";
 
 @Injectable()
 export class ShipmentService {

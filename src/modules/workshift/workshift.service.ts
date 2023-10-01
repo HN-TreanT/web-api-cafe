@@ -2,6 +2,7 @@ import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { WORKSHIFT_REPOSITORY } from "src/constants/repository_enum";
 import { Workshift } from "./workshift.entity";
 import { WorkshiftCreate } from "./dto/workshift-create.dto";
+import { Worker } from "cluster";
 import { EmployeeWorkShiftService } from "../employee_workshift/employee_workshift.service";
 
 @Injectable()
