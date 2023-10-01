@@ -7,7 +7,6 @@ import { EmployeeWorkShift } from "../employee_workshift/employee_workshift.enti
 import { Workshift } from "../workshift/workshift.entity";
 import { Position } from "../position/position.entity";
 import { EmployeeWorkShiftService } from "../employee_workshift/employee_workshift.service";
-import { Sequelize } from "sequelize";
 import { EmployeeFilter } from "./dto/employee-filter.dto";
 import { Op } from "sequelize";
 
