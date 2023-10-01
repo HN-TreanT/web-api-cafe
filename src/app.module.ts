@@ -40,23 +40,23 @@ import { DTCheckInventorModule } from "./modules/detail-check-inventory/detail-c
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    CacheModule.registerAsync({
-      isGlobal: true,
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        ttl: 100,
-        store: redisStore,
-        host: "localhost",
-        port: 6379,
-      }),
-    }),
-    BullModule.forRoot({
-      redis: {
-        host: "localhost",
-        port: 6379,
-      },
-    }),
+    // CacheModule.registerAsync({
+    //   isGlobal: true,
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     ttl: 100,
+    //     store: redisStore,
+    //     host: "localhost",
+    //     port: 6379,
+    //   }),
+    // }),
+    // BullModule.forRoot({
+    //   redis: {
+    //     host: "localhost",
+    //     port: 6379,
+    //   },
+    // }),
 
     databaseModule,
     LoggerModule,
