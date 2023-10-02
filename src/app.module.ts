@@ -36,6 +36,7 @@ import { CheckInventory } from "./modules/check_inventory/check_inventory";
 import { CheckInventoryModule } from "./modules/check_inventory/check-inventory.module";
 import { TransformInterceptor } from "./Interceptors/tranform.interceptor";
 import { DTCheckInventorModule } from "./modules/detail-check-inventory/detail-check-inventor.module";
+import { InvoiceDetailModule } from "./modules/invoice_detail/invoice-detail.module";
 
 @Module({
   imports: [
@@ -83,6 +84,7 @@ import { DTCheckInventorModule } from "./modules/detail-check-inventory/detail-c
     DetailShipmentModule,
     CheckInventoryModule,
     DTCheckInventorModule,
+    InvoiceDetailModule,
   ],
   controllers: [AppController],
   providers: [

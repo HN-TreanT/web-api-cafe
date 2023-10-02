@@ -19,7 +19,7 @@ import { Employee } from "../employee/employee.entity";
 @Controller("position")
 export class PositionController {
   constructor(@Inject(POSITION_REPOSITORY) private readonly positionRepository: typeof Position) {}
-  @Post("")
+  @Post("/")
   async create(@Body() positionCreate: PositionCreate) {
     return await this.positionRepository.create(positionCreate);
   }

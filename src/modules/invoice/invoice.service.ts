@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { INVOICE_REPOSITORY } from "src/constants/repository_enum";
+import { INVOICE_DETAIL_REPOSITORY, INVOICE_REPOSITORY } from "src/constants/repository_enum";
 import { Invoice } from "./invoice.entity";
 import { PagedData } from "src/models/PagedData";
 import { InvoiceCreate } from "./dto/invoice-create.dto";
@@ -11,10 +11,17 @@ import { TableFoodInvoice } from "../table_food_invoice/table_food_invoice.entit
 import { FilterDto } from "./dto/filter.dto";
 import { Op, Sequelize } from "sequelize";
 import { OrderInvoiceDto } from "./dto/order.dto";
+import { InvoiceDetail } from "../invoice_detail/invoice_detail.entity";
+import { ProductServices } from "../product/product.service";
+import { TableFood } from "../table_food/table_food.entity";
 
 @Injectable()
 export class InvoiceService {
-  constructor(@Inject(INVOICE_REPOSITORY) private readonly invoiceRepository: typeof Invoice) {}
+  constructor(
+    @Inject(INVOICE_REPOSITORY) private readonly invoiceRepository: typeof Invoice,
+    @Inject(INVOICE_DETAIL_REPOSITORY) private readonly invoiceDetaiRepository: typeof InvoiceDetail,
+    private readonly productService: ProductServices
+  ) {}
 
   async get(pagination: any, filter: FilterDto, order: OrderInvoiceDto): Promise<PagedData<Invoice>> {
     let filterInvoice: any = {};
@@ -23,7 +30,8 @@ export class InvoiceService {
     if (filter.id_customer) filterInvoice.id_customer = filter.id_customer;
     if (filter.id_employee) filterInvoice.id_employee = filter.id_employee;
     if (filter.id_promotion) filterInvoice.id_promotion = filter.id_promotion;
-    if (filter.status) filterInvoice.id_promotion = filter.status;
+    if (filter.status) filterInvoice.status = filter.status;
+    if (filter.time_start && filter.time_end) filterInvoice.createdAt = { [Op.between]: [filter.time_start, filter.time_end] };
 
     if (filter.name_customer) filterCustomer.name = { [Op.substring]: filter.name_customer };
     if (filter.email) filterCustomer.email = filter.email;
@@ -57,6 +65,9 @@ export class InvoiceService {
               }
             : null,
         },
+        {
+          model: InvoiceDetail,
+        },
       ],
     });
 
@@ -72,18 +83,58 @@ export class InvoiceService {
   }
 
   async getById(id: number): Promise<Invoice> {
-    const invoice = await this.invoiceRepository.findByPk(id);
+    const invoice = await this.invoiceRepository.findByPk(id, {
+      include: [
+        {
+          model: Employee,
+          attributes: { exclude: ["password"] },
+        },
+        { model: Promotion },
+        {
+          model: Customer,
+        },
+        {
+          model: TableFoodInvoice,
+        },
+        {
+          model: InvoiceDetail,
+        },
+      ],
+    });
     if (!invoice) throw new NotFoundException({ message: "not found invoice ", status: false });
     return invoice;
   }
 
   async create(infoCreate: InvoiceCreate): Promise<Invoice> {
-    return await this.invoiceRepository.create(infoCreate);
+    const invoice = await this.invoiceRepository.create(infoCreate);
+    let invoice_details: any = [];
+    let price: number = 0;
+    if (infoCreate.lst_invoice_detail) {
+      invoice_details = infoCreate.lst_invoice_detail.map((item) => {
+        price = price + item.price * item.amount;
+        return {
+          ...item,
+          id_invoice: invoice.id,
+        };
+      });
+    }
+    await this.invoiceDetaiRepository.bulkCreate(invoice_details);
+    invoice.price = price;
+    return await invoice.save();
   }
 
   async edit(id: number, infoEdit: InoviceEdit): Promise<Invoice> {
     const invoice = await this.invoiceRepository.findByPk(id);
+
     if (!invoice) throw new NotFoundException({ message: "not found invoice ", status: false });
+    let price: any = {};
+    if (infoEdit.lst_invoice_detail) {
+      price = infoEdit.lst_invoice_detail.reduce((partialSum, item) => partialSum + item.amount * item.price, 0);
+      infoEdit.price = price;
+      await this.invoiceDetaiRepository.destroy({ where: { id_invoice: invoice.id } });
+      await this.invoiceDetaiRepository.bulkCreate(infoEdit.lst_invoice_detail);
+    }
+
     return await invoice.update(infoEdit);
   }
   async deleteById(id: number) {

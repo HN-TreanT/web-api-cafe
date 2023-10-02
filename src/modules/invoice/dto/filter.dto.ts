@@ -7,4 +7,6 @@ export class FilterDto {
   phone_number: string;
   email: string;
   id_table: string;
+  time_start: Date;
+  time_end: Date;
 }

@@ -1,11 +1,14 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { COMBO_REPOSITORY, DETAIL_COMBO_REPOSITORY } from "src/constants/repository_enum";
+import { COMBO_REPOSITORY, DETAIL_COMBO_REPOSITORY, PRODUCT_REPOSITORY } from "src/constants/repository_enum";
 import { Combo } from "./combo.entity";
 import { PagedData } from "src/models/PagedData";
 import { ComboCreate } from "./dto/combo-create.dto";
 import { ComboEdit } from "./dto/combo-edit.dto";
 import { DetailCombo } from "../detail_combo/detail_combo.entity";
 import { Product } from "../product/product.entity";
+import { ProductServices } from "../product/product.service";
+import { UseMaterial } from "../use_material/use_material.entity";
+import { Material } from "../material/material.entity";
 
 @Injectable()
 export class ComboService {
@@ -88,6 +91,35 @@ export class ComboService {
         id: id,
       },
     });
+    return true;
+  }
+
+  async checkValidMaterial(id_combo: number, amount_combo: number) {
+    const combo = await this.comboRepository.findByPk(id_combo, {
+      include: [
+        {
+          model: DetailCombo,
+          include: [
+            {
+              model: Product,
+              include: [{ model: UseMaterial, include: [Material] }],
+            },
+          ],
+        },
+      ],
+    });
+    if (!combo) throw new NotFoundException({ message: "not found combo", status: false });
+    if (combo.detail_combos) {
+      combo.detail_combos.map((item: any) => {
+        if (item.product.use_materials) {
+          item.product.use_materials.map((item: any) => {
+            if (item.amount * amount_combo > item.material.amount) {
+              throw new NotFoundException({ message: `Số lượng nguyên liệu ${item.material.name} không đủ `, status: false });
+            }
+          });
+        }
+      });
+    }
     return true;
   }
 }

@@ -98,7 +98,7 @@ export const databaseProviders = [
       //     }
       //   }
       // });
-      await sequelize.sync({});
+      // await sequelize.sync({});
       return sequelize;
     },
   },

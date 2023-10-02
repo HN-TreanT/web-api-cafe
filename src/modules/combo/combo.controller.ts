@@ -5,6 +5,7 @@ import { Op } from "sequelize";
 
 import { ComboCreate } from "./dto/combo-create.dto";
 import { ComboEdit } from "./dto/combo-edit.dto";
+import { CheckValidMaterial } from "./dto/check-valid-material.dto";
 
 @Controller("combo")
 export class ComboController {
@@ -43,5 +44,10 @@ export class ComboController {
   async deleteById(@Param("id") id: number) {
     await this.comboService.deleteById(id);
     return true;
+  }
+
+  @Post("/check-valid-material")
+  async checkValidMaterial(@Body() info: CheckValidMaterial) {
+    return await this.comboService.checkValidMaterial(info.id_combo, info.amount);
   }
 }

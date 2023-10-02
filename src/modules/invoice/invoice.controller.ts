@@ -11,6 +11,7 @@ import { OrderInvoiceDto } from "./dto/order.dto";
 @Controller("invoice")
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}
+
   @Get("/")
   @UseGuards(PaginationGuard)
   async get(@Req() req: any, @Query() filter: FilterDto, @Query() order: OrderInvoiceDto) {

@@ -8,5 +8,6 @@ import { StorageModule } from "src/helpers/storage/storage.module";
   imports: [StorageModule],
   providers: [ProductServices, ...productProvider],
   controllers: [ProductController],
+  exports: [ProductServices],
 })
 export class ProductModule {}

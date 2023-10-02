@@ -1,3 +1,5 @@
+import { InvoiceDetailEdit } from "src/modules/invoice_detail/dto/invoice-detail-edit";
+
 export class InvoiceCreate {
   id_employee: number;
   id_customer: number;
@@ -5,4 +7,6 @@ export class InvoiceCreate {
   status: number;
   time_pay: Date;
   price: number;
+
+  lst_invoice_detail: InvoiceDetailEdit[];
 }

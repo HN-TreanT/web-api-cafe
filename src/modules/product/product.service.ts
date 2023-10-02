@@ -11,6 +11,7 @@ import { StorageService } from "src/helpers/storage/storage.service";
 import { ProductFilter } from "./dto/product-filter.dto";
 import { ProductOrder } from "./dto/product-order.dto";
 import { Op } from "sequelize";
+import { Exception } from "handlebars";
 
 @Injectable()
 export class ProductServices {
@@ -117,5 +118,26 @@ export class ProductServices {
       await this.storageSerice.deleteFile(product.image.split("/")[4]);
     }
     return product.destroy();
+  }
+
+  async checkValidMaterial(amount: number, id_product: number) {
+    const product = await this.productRepository.findByPk(id_product, {
+      include: [
+        {
+          model: UseMaterial,
+          include: [Material],
+        },
+      ],
+    });
+    if (!product) throw new NotFoundException({ message: "not found product", status: false });
+    if (product.use_materials) {
+      product.use_materials.map((item) => {
+        if (item.amount * amount > item.material.amount) {
+          throw new NotFoundException({ message: `Số lượng nguyên liệu ${item.material.name} không đủ `, status: false });
+        }
+      });
+    }
+
+    return true;
   }
 }

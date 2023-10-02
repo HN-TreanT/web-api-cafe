@@ -7,6 +7,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { ProductFilter } from "./dto/product-filter.dto";
 import { ProductOrder } from "./dto/product-order.dto";
 import { ProductCreate } from "./dto/product-create.dto";
+import { CheckValidMaterail } from "./dto/check-valid-material.dto";
 
 @Controller("product")
 export class ProductController {
@@ -43,5 +44,10 @@ export class ProductController {
   async deletById(@Param("id") id: number) {
     await this.productService.deleteById(id);
     return true;
+  }
+
+  @Post("/check-valid-material")
+  async checkValidMaterial(@Body() info: CheckValidMaterail) {
+    return await this.productService.checkValidMaterial(info.amount, info.id_product);
   }
 }
