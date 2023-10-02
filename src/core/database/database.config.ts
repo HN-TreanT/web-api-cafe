@@ -27,11 +27,20 @@ export const databaseConfig: IDatabaseConfig = {
     // database: process.env.DB_NAME_PRODUCTION,
     // host: process.env.DB_HOST,
     // dialect: process.env.DB_DIALECT,
-    username: "ul71ctbbceafevp7",
-    password: "jSEcatyfs2hr4kowjCdY",
-    database: "bemnn0vlkcwd9rou1es9",
-    host: "bemnn0vlkcwd9rou1es9-mysql.services.clever-cloud.com",
-    port: 3306,
+    // username: "ul71ctbbceafevp7",
+    // password: "jSEcatyfs2hr4kowjCdY",
+    // database: "bemnn0vlkcwd9rou1es9",
+    // host: "bemnn0vlkcwd9rou1es9-mysql.services.clever-cloud.com",
+    // port: 3306,
+    // dialect: "mysql",
+
+    //mysql railway
+
+    username: "root",
+    password: "7yYRHlkPO6m8K648v0Ut",
+    database: "railway",
+    host: "containers-us-west-171.railway.app",
+    port: 7930,
     dialect: "mysql",
   },
 };
