@@ -14,6 +14,8 @@ import { OrderInvoiceDto } from "./dto/order.dto";
 import { InvoiceDetail } from "../invoice_detail/invoice_detail.entity";
 import { ProductServices } from "../product/product.service";
 import { TableFood } from "../table_food/table_food.entity";
+import { SplitInvoice } from "./dto/split-invoice.dto";
+import { CombineInvoice } from "./dto/combine-invoice.dto";
 
 @Injectable()
 export class InvoiceService {
@@ -111,7 +113,7 @@ export class InvoiceService {
     let price: number = 0;
     if (infoCreate.lst_invoice_detail) {
       invoice_details = infoCreate.lst_invoice_detail.map((item) => {
-        price = price + item.price * item.amount;
+        price = price + item.price;
         return {
           ...item,
           id_invoice: invoice.id,
@@ -129,7 +131,7 @@ export class InvoiceService {
     if (!invoice) throw new NotFoundException({ message: "not found invoice ", status: false });
     let price: any = {};
     if (infoEdit.lst_invoice_detail) {
-      price = infoEdit.lst_invoice_detail.reduce((partialSum, item) => partialSum + item.amount * item.price, 0);
+      price = infoEdit.lst_invoice_detail.reduce((partialSum, item) => partialSum + item.price, 0);
       infoEdit.price = price;
       await this.invoiceDetaiRepository.destroy({ where: { id_invoice: invoice.id } });
       await this.invoiceDetaiRepository.bulkCreate(infoEdit.lst_invoice_detail);
@@ -141,4 +143,58 @@ export class InvoiceService {
     await this.invoiceRepository.destroy({ where: { id: id } });
     return true;
   }
+
+  async splitInvoice(splitInvoice: SplitInvoice) {
+    const oldInvoice = await this.invoiceRepository.findByPk(splitInvoice.id_old_order, {
+      include: [InvoiceDetail],
+    });
+  }
+
+  async combineInvocie(combineInvocie: CombineInvoice) {
+    const old_invoice = await this.invoiceRepository.findByPk(combineInvocie.id_invoice_old, {
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+      include: [InvoiceDetail],
+    });
+    const new_invoice = await this.invoiceRepository.findByPk(combineInvocie.id_invoice_new, {
+      include: [InvoiceDetail],
+    });
+    if (!old_invoice || !new_invoice) throw new NotFoundException({ message: "not found invoice ", status: false });
+    const combinedData = new Map();
+    function addToMap(array) {
+      for (const item of array) {
+        const key = item.id_product || item.id_combo;
+        if (combinedData.has(key)) {
+          const existingItem = combinedData.get(key);
+          existingItem.amount += item.amount;
+          existingItem.price += item.price;
+        } else {
+          combinedData.set(key, { ...item });
+        }
+      }
+    }
+    addToMap(new_invoice.toJSON().invoice_details);
+    addToMap(old_invoice.toJSON().invoice_details);
+    const combinedArray = Array.from(combinedData.values());
+    const dataUpdate = combinedArray.map((item) => {
+      return {
+        id_invoice: new_invoice.id,
+        id_product: item.id_product,
+        id_combo: item.id_combo,
+        isCombo: item.isCombo,
+        price: item.price,
+        amount: item.amount,
+      };
+    });
+
+    await this.invoiceDetaiRepository.destroy({ where: { id_invoice: old_invoice.id } });
+    await old_invoice.destroy();
+    await this.invoiceDetaiRepository.destroy({ where: { id_invoice: new_invoice.id } });
+    await this.invoiceDetaiRepository.bulkCreate(dataUpdate);
+    let price = dataUpdate.reduce((partialSum, item) => partialSum + item.price, 0);
+    new_invoice.price = price;
+    await new_invoice.save();
+
+    return dataUpdate;
+  }
+  async combbineTable() {}
 }

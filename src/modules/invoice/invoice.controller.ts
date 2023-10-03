@@ -7,6 +7,8 @@ import { Transform } from "class-transformer";
 import { Op } from "sequelize";
 import { FilterDto } from "./dto/filter.dto";
 import { OrderInvoiceDto } from "./dto/order.dto";
+import { SplitInvoice } from "./dto/split-invoice.dto";
+import { CombineInvoice } from "./dto/combine-invoice.dto";
 
 @Controller("invoice")
 export class InvoiceController {
@@ -38,5 +40,15 @@ export class InvoiceController {
   async deleteById(@Param("id") id: number) {
     await this.invoiceService.deleteById(id);
     return true;
+  }
+
+  @Post("/split-order")
+  async splitOrder(@Body() splitInvoice: SplitInvoice) {
+    return await this.invoiceService.splitInvoice(splitInvoice);
+  }
+
+  @Post("/combine-inovice")
+  async combineInvoice(@Body() combineInvoice: CombineInvoice) {
+    return await this.invoiceService.combineInvocie(combineInvoice);
   }
 }
