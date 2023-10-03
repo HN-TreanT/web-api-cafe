@@ -10,11 +10,12 @@ export class TableController {
   constructor(private readonly tableSerivce: TableFoodService) {}
   @Get("/")
   @UseGuards(PaginationGuard)
-  async get(@Req() req: any, @Query("search") search: string) {
+  async get(@Req() req: any, @Query("search") search: string, @Query("status") status: number) {
+    let filter: any = {};
+    if (search) filter.name = { [Op.substring]: search };
+    if (!Number.isNaN(status)) filter.status = status;
     const pagination = req.pagination;
-    const data = await this.tableSerivce.get(pagination, {
-      name: { [Op.substring]: search },
-    });
+    const data = await this.tableSerivce.get(pagination, filter);
     return data;
   }
 

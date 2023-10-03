@@ -43,6 +43,12 @@ export class TablefoodInoviceService {
     if (!tbInvoice) throw new NotFoundException({ message: "not found ", status: false });
     return await tbInvoice.update(infoEdit);
   }
+
+  async editMany(id_invoice: number, data: TblInvoiceEdit[]) {
+    await this._repository.destroy({ where: { id_invoice: id_invoice } });
+    await this._repository.bulkCreate(data);
+    return true;
+  }
   async deleteById(id: number) {
     const tbInvoice = await this._repository.findByPk(id);
     if (!tbInvoice) throw new NotFoundException({ message: "not found ", status: false });

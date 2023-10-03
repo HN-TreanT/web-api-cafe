@@ -9,4 +9,5 @@ export class InoviceEdit {
   price: number;
 
   lst_invoice_detail: InvoiceDetailEdit[];
+  id_tables: number[];
 }

@@ -9,4 +9,6 @@ export class InvoiceCreate {
   price: number;
 
   lst_invoice_detail: InvoiceDetailEdit[];
+
+  id_tables: number[];
 }

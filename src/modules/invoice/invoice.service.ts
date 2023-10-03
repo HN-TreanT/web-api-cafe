@@ -16,6 +16,9 @@ import { ProductServices } from "../product/product.service";
 import { TableFood } from "../table_food/table_food.entity";
 import { SplitInvoice } from "./dto/split-invoice.dto";
 import { CombineInvoice } from "./dto/combine-invoice.dto";
+import { TblInvoiceCreate } from "../table_food_invoice/dto/tbf-invoice-create";
+import { TablefoodInoviceService } from "../table_food_invoice/tablefood-invoice.service";
+import { TblInvoiceEdit } from "../table_food_invoice/dto/tbl-inovice-edit.dto";
 
 @Injectable()
 export class InvoiceService {
@@ -23,7 +26,8 @@ export class InvoiceService {
     @Inject(INVOICE_REPOSITORY) private readonly invoiceRepository: typeof Invoice,
     @Inject(INVOICE_DETAIL_REPOSITORY) private readonly invoiceDetaiRepository: typeof InvoiceDetail,
     private readonly productService: ProductServices,
-    @Inject(TABLEFOOD_INVOICE_REPOSITORY) private readonly tablefoodInvoiceRepository: typeof TableFoodInvoice
+    @Inject(TABLEFOOD_INVOICE_REPOSITORY) private readonly tablefoodInvoiceRepository: typeof TableFoodInvoice,
+    private readonly tableInvoiceService: TablefoodInoviceService
   ) {}
 
   async get(pagination: any, filter: FilterDto, order: OrderInvoiceDto): Promise<PagedData<Invoice>> {
@@ -111,7 +115,9 @@ export class InvoiceService {
   async create(infoCreate: InvoiceCreate): Promise<Invoice> {
     const invoice = await this.invoiceRepository.create(infoCreate);
     let invoice_details: any = [];
+    let table_food_invoices: TblInvoiceCreate[];
     let price: number = 0;
+    //create invoice detail
     if (infoCreate.lst_invoice_detail) {
       invoice_details = infoCreate.lst_invoice_detail.map((item) => {
         price = price + item.price;
@@ -121,6 +127,17 @@ export class InvoiceService {
         };
       });
     }
+    //create table_invoice
+    if (infoCreate.id_tables) {
+      table_food_invoices = infoCreate.id_tables.map((item) => {
+        return {
+          id_table: item,
+          id_invoice: invoice.id,
+        };
+      });
+    }
+
+    await this.tableInvoiceService.createMany(table_food_invoices);
     await this.invoiceDetaiRepository.bulkCreate(invoice_details);
     invoice.price = price;
     return await invoice.save();
@@ -131,6 +148,7 @@ export class InvoiceService {
 
     if (!invoice) throw new NotFoundException({ message: "not found invoice ", status: false });
     let price: any = {};
+    //edit invoice_detail
     if (infoEdit.lst_invoice_detail) {
       price = infoEdit.lst_invoice_detail.reduce((partialSum, item) => partialSum + item.price, 0);
       infoEdit.price = price;
@@ -138,9 +156,23 @@ export class InvoiceService {
       await this.invoiceDetaiRepository.bulkCreate(infoEdit.lst_invoice_detail);
     }
 
+    //edit invoice_table
+    if (infoEdit.id_tables) {
+      const table_food_invoices: TblInvoiceEdit[] = infoEdit.id_tables.map((item) => {
+        return {
+          id_table: item,
+          id_invoice: invoice.id,
+        };
+      });
+
+      await this.tableInvoiceService.editMany(invoice.id, table_food_invoices);
+    }
+
     return await invoice.update(infoEdit);
   }
   async deleteById(id: number) {
+    await this.invoiceDetaiRepository.destroy({ where: { id_invoice: id } });
+    await this.tableInvoiceService.deleteMany(id, null);
     await this.invoiceRepository.destroy({ where: { id: id } });
     return true;
   }
