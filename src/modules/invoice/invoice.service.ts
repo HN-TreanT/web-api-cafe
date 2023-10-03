@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { INVOICE_DETAIL_REPOSITORY, INVOICE_REPOSITORY } from "src/constants/repository_enum";
+import { INVOICE_DETAIL_REPOSITORY, INVOICE_REPOSITORY, TABLEFOOD_INVOICE_REPOSITORY, TABLEFOOD_REPOSITORY } from "src/constants/repository_enum";
 import { Invoice } from "./invoice.entity";
 import { PagedData } from "src/models/PagedData";
 import { InvoiceCreate } from "./dto/invoice-create.dto";
@@ -22,7 +22,8 @@ export class InvoiceService {
   constructor(
     @Inject(INVOICE_REPOSITORY) private readonly invoiceRepository: typeof Invoice,
     @Inject(INVOICE_DETAIL_REPOSITORY) private readonly invoiceDetaiRepository: typeof InvoiceDetail,
-    private readonly productService: ProductServices
+    private readonly productService: ProductServices,
+    @Inject(TABLEFOOD_INVOICE_REPOSITORY) private readonly tablefoodInvoiceRepository: typeof TableFoodInvoice
   ) {}
 
   async get(pagination: any, filter: FilterDto, order: OrderInvoiceDto): Promise<PagedData<Invoice>> {
@@ -150,7 +151,7 @@ export class InvoiceService {
     });
   }
 
-  async combineInvocie(combineInvocie: CombineInvoice) {
+  async combineInvocie(isCombineTable: boolean, combineInvocie: CombineInvoice) {
     const old_invoice = await this.invoiceRepository.findByPk(combineInvocie.id_invoice_old, {
       attributes: { exclude: ["createdAt", "updatedAt"] },
       include: [InvoiceDetail],
@@ -185,7 +186,11 @@ export class InvoiceService {
         amount: item.amount,
       };
     });
-
+    if (isCombineTable) {
+      await this.tablefoodInvoiceRepository.destroy({ where: { id_invoice: old_invoice.id } });
+    } else {
+      await this.tablefoodInvoiceRepository.update({ id_invoice: new_invoice.id }, { where: { id_invoice: old_invoice.id } });
+    }
     await this.invoiceDetaiRepository.destroy({ where: { id_invoice: old_invoice.id } });
     await old_invoice.destroy();
     await this.invoiceDetaiRepository.destroy({ where: { id_invoice: new_invoice.id } });
@@ -196,5 +201,4 @@ export class InvoiceService {
 
     return dataUpdate;
   }
-  async combbineTable() {}
 }

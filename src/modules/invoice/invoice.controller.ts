@@ -48,7 +48,11 @@ export class InvoiceController {
   }
 
   @Post("/combine-inovice")
-  async combineInvoice(@Body() combineInvoice: CombineInvoice) {
-    return await this.invoiceService.combineInvocie(combineInvoice);
+  async combineInvoice(@Query("isCombineTable") isCombineTable: boolean, @Body() combineInvoice: CombineInvoice) {
+    let check: boolean = false;
+    if (isCombineTable) {
+      check = isCombineTable;
+    }
+    return await this.invoiceService.combineInvocie(check, combineInvoice);
   }
 }
