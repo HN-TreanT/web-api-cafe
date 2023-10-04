@@ -1,18 +1,24 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Param, Post, Put, Req, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards, UseInterceptors } from "@nestjs/common";
 import { PromotionServices } from "./promotion.service";
 
 import { PromotionCreate } from "./dto/promtion-create.dto";
 import { PaginationGuard } from "src/guards/pagination.guard";
 import { PromotionEdit } from "./dto/promtion-edit.dto";
+import { PromotionFilter } from "./dto/promotion-filter.dto";
+import { Op } from "sequelize";
 
 @Controller("promotion")
 export class PromotionController {
   constructor(private readonly promotionService: PromotionServices) {}
   @Get("/")
   @UseGuards(PaginationGuard)
-  async get(@Req() req: any) {
+  async get(@Req() req: any, @Query() filter: PromotionFilter) {
+    let promotion_filter: any = {};
     const pagination = req.pagination;
-    const data = await this.promotionService.get(pagination, {});
+    if (filter.name) promotion_filter.name = { [Op.substring]: filter.name };
+
+    if (filter.condition) promotion_filter.condition = { [Op.lt]: filter.condition };
+    const data = await this.promotionService.get(pagination, promotion_filter);
     return data;
   }
 

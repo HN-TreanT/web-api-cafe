@@ -9,6 +9,7 @@ import { FilterDto } from "./dto/filter.dto";
 import { OrderInvoiceDto } from "./dto/order.dto";
 import { SplitInvoice } from "./dto/split-invoice.dto";
 import { CombineInvoice } from "./dto/combine-invoice.dto";
+import { Payment } from "./dto/payment.dto";
 
 @Controller("invoice")
 export class InvoiceController {
@@ -54,5 +55,10 @@ export class InvoiceController {
       check = isCombineTable;
     }
     return await this.invoiceService.combineInvocie(check, combineInvoice);
+  }
+
+  @Post("/payment/:invoice_id")
+  async payment(@Param("invoice_id") invoice_id: number, @Body() paymentInfo: Payment) {
+    return await this.invoiceService.payment(invoice_id, paymentInfo);
   }
 }

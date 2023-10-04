@@ -19,14 +19,18 @@ import { CombineInvoice } from "./dto/combine-invoice.dto";
 import { TblInvoiceCreate } from "../table_food_invoice/dto/tbf-invoice-create";
 import { TablefoodInoviceService } from "../table_food_invoice/tablefood-invoice.service";
 import { TblInvoiceEdit } from "../table_food_invoice/dto/tbl-inovice-edit.dto";
+import { Product } from "../product/product.entity";
+import { Combo } from "../combo/combo.entity";
+import { Payment } from "./dto/payment.dto";
+import { format } from "date-fns";
 
 @Injectable()
 export class InvoiceService {
   constructor(
     @Inject(INVOICE_REPOSITORY) private readonly invoiceRepository: typeof Invoice,
     @Inject(INVOICE_DETAIL_REPOSITORY) private readonly invoiceDetaiRepository: typeof InvoiceDetail,
-    private readonly productService: ProductServices,
     @Inject(TABLEFOOD_INVOICE_REPOSITORY) private readonly tablefoodInvoiceRepository: typeof TableFoodInvoice,
+    @Inject(TABLEFOOD_REPOSITORY) private readonly tableFoodRepository: typeof TableFood,
     private readonly tableInvoiceService: TablefoodInoviceService
   ) {}
 
@@ -74,6 +78,7 @@ export class InvoiceService {
         },
         {
           model: InvoiceDetail,
+          include: [Product, Combo],
         },
       ],
     });
@@ -105,6 +110,7 @@ export class InvoiceService {
         },
         {
           model: InvoiceDetail,
+          include: [Product, Combo],
         },
       ],
     });
@@ -239,8 +245,11 @@ export class InvoiceService {
       }
     });
 
+    // let priceTach = splitInvoice.lst_inovice_detail.reduce((partialSum, item) => partialSum + item.price, 0);
+    oldInvoice.price = oldInvoice.price - invocie.price;
+    await oldInvoice.save();
     ////////////////////////////////////////////////////////////////
-    return invocie;
+    return true;
   }
 
   async combineInvocie(isCombineTable: boolean, combineInvocie: CombineInvoice) {
@@ -291,6 +300,21 @@ export class InvoiceService {
     new_invoice.price = price;
     await new_invoice.save();
 
-    return dataUpdate;
+    return true;
+  }
+
+  async payment(invoice_id: number, paymentInfo: Payment) {
+    const date = new Date();
+    const invoice = await this.invoiceRepository.findByPk(invoice_id);
+
+    if (!invoice) throw new NotFoundException({ message: "not found inovice ", status: false });
+    invoice.status = 1;
+    invoice.price = paymentInfo.price_current;
+    invoice.time_pay = date;
+    const table_foods = await this.tablefoodInvoiceRepository.findAll({ where: { id_invoice: invoice_id } });
+    const id_table_food = table_foods.map((item) => item.id_table);
+    await this.tableFoodRepository.update({ status: 0 }, { where: { id: id_table_food } });
+    await invoice.save();
+    return invoice;
   }
 }
