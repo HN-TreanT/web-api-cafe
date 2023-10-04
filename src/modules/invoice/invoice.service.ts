@@ -181,6 +181,66 @@ export class InvoiceService {
     const oldInvoice = await this.invoiceRepository.findByPk(splitInvoice.id_old_order, {
       include: [InvoiceDetail],
     });
+
+    /////////=============CREATE NEW INOVICE =================///////////
+    const invocie = await this.invoiceRepository.create({ id_employee: oldInvoice.id_employee });
+
+    let invoice_details: any = [];
+    let table_food_invoices: TblInvoiceCreate[] = [];
+    let price: number = 0;
+    //create new invoice detail
+    if (splitInvoice.lst_inovice_detail) {
+      invoice_details = splitInvoice.lst_inovice_detail.map((item) => {
+        price = price + item.price;
+        return {
+          ...item,
+          id_invoice: invocie.id,
+        };
+      });
+    }
+
+    // create new invoice table
+    if (splitInvoice.id_tables) {
+      table_food_invoices = splitInvoice.id_tables.map((item) => {
+        return {
+          id_table: item,
+          id_invoice: invocie.id,
+        };
+      });
+    }
+
+    await this.invoiceDetaiRepository.bulkCreate(invoice_details);
+    await this.tablefoodInvoiceRepository.bulkCreate(table_food_invoices);
+
+    invocie.price = price;
+    await invocie.save();
+    ////////////////////////////////////////////////////////////////
+
+    //====================UPDATE INVOICE DETAIL OF OLD INVOICE ===================////
+    if (!oldInvoice) throw new NotFoundException({ message: "not found invoice", status: false });
+    oldInvoice.invoice_details.forEach(async (item) => {
+      if (splitInvoice.lst_inovice_detail) {
+        splitInvoice.lst_inovice_detail.forEach(async (item2) => {
+          if (item2.id_product === item.id_product || item2.id_combo === item.id_combo) {
+            if (item.amount === item2.amount) {
+              await this.invoiceDetaiRepository.destroy({ where: { id: item.id } });
+            } else {
+              const data = {
+                ...item2,
+                id_invoice: oldInvoice.id,
+                amount: item.amount - item2.amount,
+                price: item.price - item2.price,
+                isCombo: item2.id_combo ? true : false,
+              };
+              await this.invoiceDetaiRepository.update(data, { where: { id: item.id } });
+            }
+          }
+        });
+      }
+    });
+
+    ////////////////////////////////////////////////////////////////
+    return invocie;
   }
 
   async combineInvocie(isCombineTable: boolean, combineInvocie: CombineInvoice) {
@@ -193,7 +253,7 @@ export class InvoiceService {
     });
     if (!old_invoice || !new_invoice) throw new NotFoundException({ message: "not found invoice ", status: false });
     const combinedData = new Map();
-    function addToMap(array) {
+    function addToMap(array: any) {
       for (const item of array) {
         const key = item.id_product || item.id_combo;
         if (combinedData.has(key)) {

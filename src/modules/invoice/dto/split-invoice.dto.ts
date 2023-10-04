@@ -4,5 +4,6 @@ import { InvoiceDetailEdit } from "src/modules/invoice_detail/dto/invoice-detail
 export class SplitInvoice {
   @IsNotEmpty()
   id_old_order: number;
-  lst_id_inovice_detail: InvoiceDetailEdit[];
+  lst_inovice_detail: InvoiceDetailEdit[];
+  id_tables: number[];
 }
