@@ -5,34 +5,48 @@ import { Op } from "sequelize";
 import { InvoiceDetailCreate } from "./dto/invoice-detail-create";
 import { InvoiceDetailEdit } from "./dto/invoice-detail-edit";
 import { DtInvoiceFilter } from "./dto/dt-invoice-filter";
+import { JwtAccessGuard } from "src/guards/jwt-access.guard";
+import { RolesGuard } from "src/guards/role.guard";
+import { ROLES } from "src/constants/role.enum";
+import { Roles } from "src/decorator/role.decorator";
 @Controller("invoice-detail")
 export class InvoiceDetailController {
   constructor(private readonly invoiceDetailService: InvoiceDetailService) {}
   @Get("/")
-  @UseGuards(PaginationGuard)
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
   async get(@Req() req: any, @Query() filter: DtInvoiceFilter) {
     const pagination = req.pagination;
     const data = await this.invoiceDetailService.get(pagination, filter);
     return data;
   }
 
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
   async getById(@Param("id") id: number) {
     const data = await this.invoiceDetailService.getById(id);
     return data;
   }
 
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
   async create(@Body() infoCreate: InvoiceDetailCreate) {
     const data = await this.invoiceDetailService.create(infoCreate);
     return data;
   }
 
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
   async edit(@Param("id") id: number, @Body() infoEdit: InvoiceDetailEdit) {
     const data = await this.invoiceDetailService.edit(id, infoEdit);
     return data;
   }
+
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")
   async deleteById(@Param("id") id: number) {
     await this.invoiceDetailService.deleteById(id);

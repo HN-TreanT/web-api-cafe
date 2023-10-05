@@ -6,12 +6,17 @@ import { PaginationGuard } from "src/guards/pagination.guard";
 import { PromotionEdit } from "./dto/promtion-edit.dto";
 import { PromotionFilter } from "./dto/promotion-filter.dto";
 import { Op } from "sequelize";
+import { JwtAccessGuard } from "src/guards/jwt-access.guard";
+import { Roles } from "src/decorator/role.decorator";
+import { ROLES } from "src/constants/role.enum";
+import { RolesGuard } from "src/guards/role.guard";
 
 @Controller("promotion")
 export class PromotionController {
   constructor(private readonly promotionService: PromotionServices) {}
   @Get("/")
-  @UseGuards(PaginationGuard)
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
   async get(@Req() req: any, @Query() filter: PromotionFilter) {
     let promotion_filter: any = {};
     const pagination = req.pagination;
@@ -22,23 +27,31 @@ export class PromotionController {
     return data;
   }
 
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
   async getById(@Param("id") id: number) {
     const data = await this.promotionService.getById(id);
     return data;
   }
 
+  @Roles(ROLES.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
   async create(@Body() promotionCreate: PromotionCreate) {
     const data = await this.promotionService.create(promotionCreate);
     return data;
   }
 
+  @Roles(ROLES.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
   async edit(@Param("id") id: number, @Body() promotionEdit: PromotionEdit) {
     const data = await this.promotionService.edit(id, promotionEdit);
     return data;
   }
+  @Roles(ROLES.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")
   async deleteById(@Param("id") id: number) {
     await this.promotionService.delete(id);

@@ -4,12 +4,17 @@ import { PaginationGuard } from "src/guards/pagination.guard";
 
 import { TableFoodDto } from "./dto/table-food.dto";
 import { Op } from "sequelize";
+import { JwtAccessGuard } from "src/guards/jwt-access.guard";
+import { RolesGuard } from "src/guards/role.guard";
+import { Roles } from "src/decorator/role.decorator";
+import { ROLES } from "src/constants/role.enum";
 
 @Controller("table-food")
 export class TableController {
   constructor(private readonly tableSerivce: TableFoodService) {}
   @Get("/")
-  @UseGuards(PaginationGuard)
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
   async get(@Req() req: any, @Query("search") search: string, @Query("status") status: number) {
     let filter: any = {};
     if (search) filter.name = { [Op.substring]: search };
@@ -19,24 +24,32 @@ export class TableController {
     return data;
   }
 
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
   async getById(@Param("id") id: number) {
     const data = await this.tableSerivce.getById(id);
     return data;
   }
 
+  @Roles(ROLES.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Post("")
   async create(@Body() createInfo: TableFoodDto) {
     const data = await this.tableSerivce.create(createInfo);
     return data;
   }
 
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
   async edit(@Param("id") id: number, @Body() editInfo: TableFoodDto) {
     const data = await this.tableSerivce.update(id, editInfo);
     return data;
   }
 
+  @Roles(ROLES.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")
   async deleteById(@Param("id") id: number) {
     await this.tableSerivce.deleteById(id);

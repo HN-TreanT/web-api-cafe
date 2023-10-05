@@ -5,12 +5,18 @@ import { CustomerCreate } from "./dto/customer-create.dto";
 import { PaginationGuard } from "src/guards/pagination.guard";
 import { CustomerEdit } from "./dto/customer-edit.dto";
 import { Op } from "sequelize";
+import { JwtAccessGuard } from "src/guards/jwt-access.guard";
+import { RolesGuard } from "src/guards/role.guard";
+import { ROLES } from "src/constants/role.enum";
+import { Roles } from "src/decorator/role.decorator";
 
 @Controller("customer")
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
+
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
   @Get("/")
-  @UseGuards(PaginationGuard)
   async get(@Req() req: any, @Query("search") search: string, @Query("email") email: string) {
     const pagination = req.pagination;
     let filter = {};
@@ -25,23 +31,32 @@ export class CustomerController {
     return data;
   }
 
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
   async getById(@Param("id") id: number) {
     const data = await this.customerService.getById(id);
     return data;
   }
 
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
   async create(@Body() promotionCreate: CustomerCreate) {
     const data = await this.customerService.create(promotionCreate);
     return data;
   }
 
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
   async edit(@Param("id") id: number, @Body() promotionEdit: CustomerEdit) {
     const data = await this.customerService.edit(id, promotionEdit);
     return data;
   }
+
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")
   async deleteById(@Param("id") id: number) {
     await this.customerService.delete(id);
