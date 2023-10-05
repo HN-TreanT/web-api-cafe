@@ -59,6 +59,13 @@ export class InvoiceController {
 
   @Post("/payment/:invoice_id")
   async payment(@Param("invoice_id") invoice_id: number, @Body() paymentInfo: Payment) {
+    console.log(invoice_id);
     return await this.invoiceService.payment(invoice_id, paymentInfo);
+  }
+
+  @Get("/complete-invoice/:id")
+  async test(@Param("id") id: number) {
+    const data = await this.invoiceService.completeInvocie(id);
+    return data;
   }
 }

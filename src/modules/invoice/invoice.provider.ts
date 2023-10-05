@@ -17,4 +17,5 @@ export const invoiceProvider = [
   { provide: MATERIAL_REPOSITORY, useValue: Material },
   { provide: TABLEFOOD_INVOICE_REPOSITORY, useValue: TableFoodInvoice },
   { provide: TABLEFOOD_REPOSITORY, useValue: TableFood },
+  { provide: MATERIAL_REPOSITORY, useValue: Material },
 ];

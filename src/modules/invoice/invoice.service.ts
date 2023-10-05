@@ -1,5 +1,11 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { INVOICE_DETAIL_REPOSITORY, INVOICE_REPOSITORY, TABLEFOOD_INVOICE_REPOSITORY, TABLEFOOD_REPOSITORY } from "src/constants/repository_enum";
+import {
+  INVOICE_DETAIL_REPOSITORY,
+  INVOICE_REPOSITORY,
+  MATERIAL_REPOSITORY,
+  TABLEFOOD_INVOICE_REPOSITORY,
+  TABLEFOOD_REPOSITORY,
+} from "src/constants/repository_enum";
 import { Invoice } from "./invoice.entity";
 import { PagedData } from "src/models/PagedData";
 import { InvoiceCreate } from "./dto/invoice-create.dto";
@@ -23,6 +29,9 @@ import { Product } from "../product/product.entity";
 import { Combo } from "../combo/combo.entity";
 import { Payment } from "./dto/payment.dto";
 import { format } from "date-fns";
+import { UseMaterial } from "../use_material/use_material.entity";
+import { DetailCombo } from "../detail_combo/detail_combo.entity";
+import { Material } from "../material/material.entity";
 
 @Injectable()
 export class InvoiceService {
@@ -31,6 +40,7 @@ export class InvoiceService {
     @Inject(INVOICE_DETAIL_REPOSITORY) private readonly invoiceDetaiRepository: typeof InvoiceDetail,
     @Inject(TABLEFOOD_INVOICE_REPOSITORY) private readonly tablefoodInvoiceRepository: typeof TableFoodInvoice,
     @Inject(TABLEFOOD_REPOSITORY) private readonly tableFoodRepository: typeof TableFood,
+    @Inject(MATERIAL_REPOSITORY) private readonly materialRepository: typeof Material,
     private readonly tableInvoiceService: TablefoodInoviceService
   ) {}
 
@@ -308,7 +318,7 @@ export class InvoiceService {
     const invoice = await this.invoiceRepository.findByPk(invoice_id);
 
     if (!invoice) throw new NotFoundException({ message: "not found inovice ", status: false });
-    invoice.status = 1;
+    // invoice.status = 1;
     invoice.price = paymentInfo.price_current;
     invoice.time_pay = date;
     const table_foods = await this.tablefoodInvoiceRepository.findAll({ where: { id_invoice: invoice_id } });
@@ -316,5 +326,96 @@ export class InvoiceService {
     await this.tableFoodRepository.update({ status: 0 }, { where: { id: id_table_food } });
     await invoice.save();
     return invoice;
+  }
+
+  async completeInvocie(id_invoice: number) {
+    const invoice = await this.invoiceRepository.findByPk(id_invoice);
+    if (!invoice) throw new NotFoundException({ message: "not found invoice ", status: true });
+    const detail_inovices = await this.invoiceDetaiRepository.findAll({
+      where: {
+        id_invoice: id_invoice,
+      },
+      include: [
+        {
+          model: Product,
+          include: [UseMaterial],
+        },
+        {
+          model: Combo,
+          include: [
+            {
+              model: DetailCombo,
+              include: [
+                {
+                  model: Product,
+                  include: [UseMaterial],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    const use_materials = new Map();
+    function addArrayToMap(array: any) {
+      for (const item of array) {
+        const key = item.id_material;
+        if (use_materials.has(key)) {
+          const existingItem = use_materials.get(key);
+          existingItem.amount = existingItem.amount + item.amount;
+        } else {
+          use_materials.set(key, {
+            id_material: item.id_material,
+            amount: item.amount,
+          });
+        }
+      }
+    }
+
+    function addSingleToMap(data: any) {
+      const key = data.id_material;
+      if (use_materials.has(key)) {
+        const existingItem = use_materials.get(key);
+        existingItem.amount = existingItem.amount + data.amount;
+      } else {
+        use_materials.set(key, {
+          id_material: data.id_material,
+          amount: data.amount,
+        });
+      }
+    }
+
+    detail_inovices.map((detail_invocie) => {
+      if (detail_invocie.product) {
+        const array = detail_invocie.product.use_materials.map((item) => {
+          return {
+            id_material: item.id_material,
+            amount: item.amount * detail_invocie.amount,
+          };
+        });
+        addArrayToMap(array);
+      }
+      if (detail_invocie.combo) {
+        detail_invocie.combo.detail_combos.forEach((detail_combo: any) => {
+          if (detail_combo.product) {
+            detail_combo.product.use_materials.forEach((item: any) => {
+              addSingleToMap({
+                id_material: item.id_material,
+                amount: item.amount * detail_invocie.amount,
+              });
+            });
+          }
+        });
+      }
+    });
+    const update_materials: any[] = Array.from(use_materials.values());
+    update_materials.forEach(async (item: any) => {
+      const material = await this.materialRepository.findByPk(item.id_material);
+      if (!material) throw new NotFoundException({ message: "not foun material", status: false });
+      await material.update({ amount: material.amount - item.amount });
+    });
+    await invoice.update({ status: 1 });
+    return true;
   }
 }
