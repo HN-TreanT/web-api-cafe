@@ -40,4 +40,9 @@ export class CheckInventoryController {
     await this.checkInventorySerivce.delete(id);
     return true;
   }
+
+  @Get("/synchronized-warehouse/:id")
+  async synchronizedWarehouse(@Param("id") id: number) {
+    return await this.checkInventorySerivce.synchronizedWarehouse(id);
+  }
 }
