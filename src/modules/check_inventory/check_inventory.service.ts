@@ -53,39 +53,44 @@ export class CheckInventoryService {
     const checkInventory = await this.checkInventoryRepository.create({
       time_check: infoCreate.time_check,
     });
-    const id_materials = infoCreate.lst_dt_check.map((item) => item.id_material);
-    const materials = await this.materialRepository.findAll({ where: { id: id_materials } });
+    if (infoCreate.lst_dt_check) {
+      const id_materials = infoCreate.lst_dt_check.map((item) => item.id_material);
+      const materials = await this.materialRepository.findAll({ where: { id: id_materials } });
 
-    const data = infoCreate.lst_dt_check.map((item) => {
-      const material = materials.find((item1: any) => item.id_material === item1.dataValues.id).toJSON();
-      return {
-        ...item,
-        id_detail_check: checkInventory.id,
-        shortage_count: material.amount - item.actual_count,
-        total_count: material.amount,
-      };
-    });
-    await this.dtcheckInventoryRepository.bulkCreate(data);
+      const data = infoCreate.lst_dt_check.map((item) => {
+        const material = materials.find((item1: any) => item.id_material === item1.dataValues.id).toJSON();
+        return {
+          ...item,
+          id_detail_check: checkInventory.id,
+          shortage_count: material.amount - item.actual_count,
+          total_count: material.amount,
+        };
+      });
+      await this.dtcheckInventoryRepository.bulkCreate(data);
+    }
     return checkInventory;
   }
 
   async edit(id: number, infoEdit: CheckInventoryDto): Promise<CheckInventory> {
     const check_inventory = await this.checkInventoryRepository.findByPk(id);
     if (!check_inventory) throw new NotFoundException({ message: "Check inventory not found", status: false });
-    const id_materials = infoEdit.lst_dt_check.map((item) => item.id_material);
-    const materials = await this.materialRepository.findAll({ where: { id: id_materials } });
+    if (infoEdit.lst_dt_check) {
+      const id_materials = infoEdit.lst_dt_check.map((item) => item.id_material);
+      const materials = await this.materialRepository.findAll({ where: { id: id_materials } });
 
-    const data = infoEdit.lst_dt_check.map((item) => {
-      const material = materials.find((item1: any) => item.id_material === item1.dataValues.id).toJSON();
-      return {
-        ...item,
-        id_detail_check: check_inventory.id,
-        shortage_count: material.amount - item.actual_count,
-        total_count: material.amount,
-      };
-    });
-    await this.dtcheckInventoryRepository.destroy({ where: { id_detail_check: check_inventory.id } });
-    await this.dtcheckInventoryRepository.bulkCreate(data);
+      const data = infoEdit.lst_dt_check.map((item) => {
+        const material = materials.find((item1: any) => item.id_material === item1.dataValues.id).toJSON();
+        return {
+          ...item,
+          id_detail_check: check_inventory.id,
+          shortage_count: material.amount - item.actual_count,
+          total_count: material.amount,
+        };
+      });
+      await this.dtcheckInventoryRepository.destroy({ where: { id_detail_check: check_inventory.id } });
+      await this.dtcheckInventoryRepository.bulkCreate(data);
+    }
+
     return check_inventory.update(infoEdit);
   }
 

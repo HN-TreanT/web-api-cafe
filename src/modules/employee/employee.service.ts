@@ -79,8 +79,11 @@ export class EmployeeService {
   async update(id: number, employeeUpdate: EmployeeUpdate): Promise<Employee> {
     const employee = await this.employeeRepository.findByPk(id);
     if (!employee) throw new NotFoundException("not found employee");
-    await this.employeeWorkshiftService.deleteMany(id);
-    await this.employeeWorkshiftService.createMany(employeeUpdate.employee_worshift);
+    if (employeeUpdate.employee_worshift) {
+      await this.employeeWorkshiftService.deleteMany(id);
+      await this.employeeWorkshiftService.createMany(employeeUpdate.employee_worshift);
+    }
+
     return await employee.update(employeeUpdate);
   }
   async deleteById(id: number) {

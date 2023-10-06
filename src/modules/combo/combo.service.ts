@@ -54,13 +54,15 @@ export class ComboService {
 
   async create(infoCreate: ComboCreate): Promise<Combo> {
     const combo = await this.comboRepository.create(infoCreate);
-    const detailProductCreate = infoCreate.id_products.map((item) => {
-      return {
-        ...item,
-        id_combo: combo.id,
-      };
-    });
-    await this.detailComboRepository.bulkCreate(detailProductCreate);
+    if (infoCreate.id_products) {
+      const detailProductCreate = infoCreate.id_products.map((item) => {
+        return {
+          ...item,
+          id_combo: combo.id,
+        };
+      });
+      await this.detailComboRepository.bulkCreate(detailProductCreate);
+    }
     return combo;
   }
 
@@ -68,20 +70,21 @@ export class ComboService {
     const combo = await this.comboRepository.findByPk(id);
 
     if (!combo) throw new NotFoundException({ message: "not found combo", status: false });
-    const detailProductCreate = infoEdit.id_products.map((item) => {
-      return {
-        ...item,
-        id_combo: combo.id,
-      };
-    });
-    await this.detailComboRepository.destroy({
-      where: {
-        id_combo: combo.id,
-      },
-    });
+    if (infoEdit.id_products) {
+      const detailProductCreate = infoEdit.id_products.map((item) => {
+        return {
+          ...item,
+          id_combo: combo.id,
+        };
+      });
+      await this.detailComboRepository.destroy({
+        where: {
+          id_combo: combo.id,
+        },
+      });
 
-    await this.detailComboRepository.bulkCreate(detailProductCreate);
-
+      await this.detailComboRepository.bulkCreate(detailProductCreate);
+    }
     return await combo.update(infoEdit);
   }
 

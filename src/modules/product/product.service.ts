@@ -72,13 +72,15 @@ export class ProductServices {
 
   async create(infoCreate: ProductCreate, file: Express.Multer.File): Promise<Product> {
     const product = await this.productRepository.create(infoCreate);
-    const use_materials = infoCreate.lst_use_material.map((item) => {
-      return {
-        ...item,
-        id_product: product.id,
-      };
-    });
-    await this.useMaterialRepository.bulkCreate(use_materials);
+    if (infoCreate.lst_use_material) {
+      const use_materials = infoCreate.lst_use_material.map((item) => {
+        return {
+          ...item,
+          id_product: product.id,
+        };
+      });
+      await this.useMaterialRepository.bulkCreate(use_materials);
+    }
     if (file) {
       const upload = await this.storageSerice.uploadFile(file, "");
       product.image = upload.publicUrl;
@@ -90,18 +92,20 @@ export class ProductServices {
     const product = await this.productRepository.findByPk(id);
 
     if (!product) throw new NotFoundException({ message: "not found product", status: false });
-    const use_materials = infoEdit.lst_use_material.map((item) => {
-      return {
-        ...item,
-        id_product: product.id,
-      };
-    });
-    await this.useMaterialRepository.destroy({
-      where: {
-        id_product: product.id,
-      },
-    });
-    await this.useMaterialRepository.bulkCreate(use_materials);
+    if (infoEdit.lst_use_material) {
+      const use_materials = infoEdit.lst_use_material.map((item) => {
+        return {
+          ...item,
+          id_product: product.id,
+        };
+      });
+      await this.useMaterialRepository.destroy({
+        where: {
+          id_product: product.id,
+        },
+      });
+      await this.useMaterialRepository.bulkCreate(use_materials);
+    }
 
     if (file) {
       await this.storageSerice.deleteFile(product.image.split("/")[4]);

@@ -142,6 +142,7 @@ export class InvoiceService {
           id_invoice: invoice.id,
         };
       });
+      await this.tableInvoiceService.createMany(table_food_invoices);
     }
     //create table_invoice
     if (infoCreate.id_tables) {
@@ -151,10 +152,10 @@ export class InvoiceService {
           id_invoice: invoice.id,
         };
       });
+
+      await this.invoiceDetaiRepository.bulkCreate(invoice_details);
     }
 
-    await this.tableInvoiceService.createMany(table_food_invoices);
-    await this.invoiceDetaiRepository.bulkCreate(invoice_details);
     invoice.price = price;
     return await invoice.save();
   }
@@ -213,6 +214,7 @@ export class InvoiceService {
           id_invoice: invocie.id,
         };
       });
+      await this.invoiceDetaiRepository.bulkCreate(invoice_details);
     }
 
     // create new invoice table
@@ -223,10 +225,8 @@ export class InvoiceService {
           id_invoice: invocie.id,
         };
       });
+      await this.tablefoodInvoiceRepository.bulkCreate(table_food_invoices);
     }
-
-    await this.invoiceDetaiRepository.bulkCreate(invoice_details);
-    await this.tablefoodInvoiceRepository.bulkCreate(table_food_invoices);
 
     invocie.price = price;
     await invocie.save();

@@ -49,15 +49,17 @@ export class ShipmentService {
   async create(infoCreate: ShipmentDto): Promise<Shipment> {
     const shipment = await this.shipmentRepository.create(infoCreate);
     let price: number = 0;
-    const detail_shipments = infoCreate.lst_detail_shipment.map((item) => {
-      price = price + item.price;
-      return {
-        ...item,
-        id_shipment: shipment.id,
-      };
-    });
-    shipment.price = price;
-    await this.detailShipmentRepository.bulkCreate(detail_shipments);
+    if (infoCreate.lst_detail_shipment) {
+      const detail_shipments = infoCreate.lst_detail_shipment.map((item) => {
+        price = price + item.price;
+        return {
+          ...item,
+          id_shipment: shipment.id,
+        };
+      });
+      shipment.price = price;
+      await this.detailShipmentRepository.bulkCreate(detail_shipments);
+    }
     return await shipment.save();
   }
 
@@ -65,16 +67,18 @@ export class ShipmentService {
     const shipment = await this.shipmentRepository.findByPk(id);
     if (!shipment) throw new NotFoundException({ message: "not found shipment", status: false });
     let price: number = 0;
-    const detail_shipments = editInfo.lst_detail_shipment.map((item) => {
-      price = price + item.price;
-      return {
-        ...item,
-        id_shipment: shipment.id,
-      };
-    });
-    editInfo.price = price;
-    await this.detailShipmentRepository.destroy({ where: { id_shipment: shipment.id } });
-    await this.detailShipmentRepository.bulkCreate(detail_shipments);
+    if (editInfo.lst_detail_shipment) {
+      const detail_shipments = editInfo.lst_detail_shipment.map((item) => {
+        price = price + item.price;
+        return {
+          ...item,
+          id_shipment: shipment.id,
+        };
+      });
+      editInfo.price = price;
+      await this.detailShipmentRepository.destroy({ where: { id_shipment: shipment.id } });
+      await this.detailShipmentRepository.bulkCreate(detail_shipments);
+    }
     return shipment.update(editInfo);
   }
 
