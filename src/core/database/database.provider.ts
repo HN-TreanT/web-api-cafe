@@ -67,37 +67,6 @@ export const databaseProviders = [
         Supplier,
         DetailCheckInventory,
       ]);
-      // sequelize.addHook("afterFind", (results: any, options) => {
-      //   if (Array.isArray(results)) {
-      //     results.forEach((result) => {
-      //       if (result?.dataValues.time_check) {
-      //         result.dataValues.time_check = format(result.dataValues.time_check, "yyyy-mm-dd hh:mm:ss");
-      //       }
-      //       if (result?.dataValues.expriation_date) {
-      //         result.dataValues.expriation_date = format(result.dataValues.expriation_date, "yyyy-mm-dd hh:mm:ss");
-      //       }
-      //       if (result?.dataValues.createdAt) {
-      //         result.dataValues.createdAt = format(result.dataValues.createdAt, "yyyy-mm-dd hh:mm:ss");
-      //       }
-      //       if (result?.dataValues.updatedAt) {
-      //         result.dataValues.updatedAt = format(result.dataValues.updatedAt, "yyyy-mm-dd hh:mm:ss");
-      //       }
-      //     });
-      //   } else {
-      //     if (results?.dataValues.time_check) {
-      //       results.dataValues.time_check = format(results.dataValues.time_check, "yyyy-mm-dd hh:mm:ss");
-      //     }
-      //     if (results?.dataValues.expriation_date) {
-      //       results.dataValues.expriation_date = format(results.dataValues.expriation_date, "yyyy-mm-dd hh:mm:ss");
-      //     }
-      //     if (results?.dataValues.createdAt) {
-      //       results.dataValues.createdAt = format(results.dataValues.createdAt, "yyyy-mm-dd hh:mm:ss");
-      //     }
-      //     if (results?.dataValues.updatedAt) {
-      //       results.dataValues.updatedAt = format(results.dataValues.updatedAt, "yyyy-mm-dd hh:mm:ss");
-      //     }
-      //   }
-      // });
       // await sequelize.sync({});
       return sequelize;
     },

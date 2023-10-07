@@ -12,6 +12,17 @@ export const databaseConfig: IDatabaseConfig = {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     dialect: process.env.DB_DIALECT,
+    dialectOptions: {
+      // useUTC: false, // for reading from database
+      dateStrings: true,
+      typeCast(field: any, next: any) {
+        // for reading from database
+        if (field.type === "DATETIME") {
+          return field.string();
+        }
+        return next();
+      },
+    },
   },
   test: {
     username: process.env.DB_USER,
@@ -20,6 +31,18 @@ export const databaseConfig: IDatabaseConfig = {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     dialect: process.env.DB_DIALECT,
+
+    dialectOptions: {
+      // useUTC: false, // for reading from database
+      dateStrings: true,
+      typeCast(field: any, next: any) {
+        // for reading from database
+        if (field.type === "DATETIME") {
+          return field.string();
+        }
+        return next();
+      },
+    },
   },
   production: {
     // username: process.env.DB_USER,
@@ -42,5 +65,17 @@ export const databaseConfig: IDatabaseConfig = {
     host: "containers-us-west-171.railway.app",
     port: 7930,
     dialect: "mysql",
+
+    dialectOptions: {
+      // useUTC: false, // for reading from database
+      dateStrings: true,
+      typeCast(field: any, next: any) {
+        // for reading from database
+        if (field.type === "DATETIME") {
+          return field.string();
+        }
+        return next();
+      },
+    },
   },
 };
