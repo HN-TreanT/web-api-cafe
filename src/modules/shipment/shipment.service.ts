@@ -27,6 +27,9 @@ export class ShipmentService {
         {
           model: Employee,
         },
+        {
+          model: DetailShipment,
+        },
       ],
     });
     const pageNumber = pagination.offset / pagination.limit + 1;
@@ -42,7 +45,7 @@ export class ShipmentService {
 
   async getById(id: number): Promise<Shipment> {
     const shipment = await this.shipmentRepository.findByPk(id, {
-      include: [Employee, Supplier],
+      include: [Employee, Supplier, DetailShipment],
     });
     if (!shipment) throw new NotFoundException({ message: "not found shipment", status: false });
     return shipment;
@@ -77,16 +80,22 @@ export class ShipmentService {
     if (!shipment) throw new NotFoundException({ message: "not found shipment", status: false });
     let price: number = 0;
     if (editInfo.lst_detail_shipment) {
-      const detail_shipments = editInfo.lst_detail_shipment.map((item) => {
+      // const detail_shipments =
+      editInfo.lst_detail_shipment.forEach(async (item) => {
         price = price + item.price;
-        return {
-          ...item,
-          id_shipment: shipment.id,
-        };
+        const detail_shipment = await this.detailShipmentRepository.findByPk(item.id_dt_shipment);
+        const material = await this.materialRepository.findByPk(item.id_material);
+
+        if (material) {
+          await material.update({ amount: material.amount + item.amount - detail_shipment.amount });
+        }
+        if (detail_shipment) {
+          await detail_shipment.update({ ...item, id_shipment: shipment.id });
+        }
       });
       editInfo.price = price;
-      await this.detailShipmentRepository.destroy({ where: { id_shipment: shipment.id } });
-      await this.detailShipmentRepository.bulkCreate(detail_shipments);
+      // await this.detailShipmentRepository.destroy({ where: { id_shipment: shipment.id } });
+      // await this.detailShipmentRepository.bulkCreate(detail_shipments);
 
       //update amount material
       // editInfo.lst_detail_shipment.forEach(async (item) => {

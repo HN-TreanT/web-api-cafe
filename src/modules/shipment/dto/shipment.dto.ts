@@ -1,4 +1,5 @@
 class DetailShipmentEdit {
+  id_dt_shipment: number;
   id_shipment: number;
   id_material: number;
   amount: number;

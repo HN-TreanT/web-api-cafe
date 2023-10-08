@@ -56,6 +56,9 @@ export class DetailShipmentService {
   async edit(id: number, infoEdit: DetailShipmentEdit): Promise<DetailShipment> {
     const detail_shipment = await this.detailShipmentRepository.findByPk(id);
     if (!detail_shipment) throw new NotFoundException({ message: "not found", status: false });
+    const material = await this.materialRepository.findByPk(infoEdit.id_material);
+    if (!material) throw new NotFoundException({ message: "not found material", status: false });
+    await material.update({ amount: material.amount + infoEdit.amount - detail_shipment.amount });
     return detail_shipment.update(infoEdit);
   }
 
