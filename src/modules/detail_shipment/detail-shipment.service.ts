@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { PagedData } from "src/models/PagedData";
 import { DetailShipment } from "./detail_shipment.enitty";
-import { DETAIL_SHIPMENT_REPOSITORY, SHIPMENT_REPOSITORY } from "src/constants/repository_enum";
+import { DETAIL_SHIPMENT_REPOSITORY, MATERIAL_REPOSITORY, SHIPMENT_REPOSITORY } from "src/constants/repository_enum";
 import { DetailShipmentCreate } from "./dto/detail-shipment-create.dto";
 import { DetailShipmentEdit } from "./dto/detail-shipment-edit";
 import { DetailShipmentFilter } from "./dto/detail-shipment-filter";
@@ -10,7 +10,10 @@ import { Material } from "../material/material.entity";
 import { DetailShipmentOrder } from "./dto/detail-shipment-order";
 @Injectable()
 export class DetailShipmentService {
-  constructor(@Inject(DETAIL_SHIPMENT_REPOSITORY) private readonly detailShipmentRepository: typeof DetailShipment) {}
+  constructor(
+    @Inject(DETAIL_SHIPMENT_REPOSITORY) private readonly detailShipmentRepository: typeof DetailShipment,
+    @Inject(MATERIAL_REPOSITORY) private readonly materialRepository: typeof Material
+  ) {}
   async get(pagination: any, filter: DetailShipmentFilter, order: DetailShipmentOrder): Promise<PagedData<DetailShipment>> {
     let filterData: any = {};
     let filterWithMaterial: any = {};
@@ -43,7 +46,11 @@ export class DetailShipmentService {
   }
 
   async create(infoCreate: DetailShipmentCreate): Promise<DetailShipment> {
-    return await this, this.detailShipmentRepository.create(infoCreate);
+    const detail_shipment = await this.detailShipmentRepository.create(infoCreate);
+    const material = await this.materialRepository.findByPk(infoCreate.id_material);
+    if (!material) throw new NotFoundException({ message: "not found material", status: false });
+    await material.update({ amount: material.amount + infoCreate.amount });
+    return detail_shipment;
   }
 
   async edit(id: number, infoEdit: DetailShipmentEdit): Promise<DetailShipment> {

@@ -1,17 +1,19 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { DETAIL_SHIPMENT_REPOSITORY, SHIPMENT_REPOSITORY } from "src/constants/repository_enum";
+import { DETAIL_SHIPMENT_REPOSITORY, MATERIAL_REPOSITORY, SHIPMENT_REPOSITORY } from "src/constants/repository_enum";
 import { Shipment } from "./shipment.entity";
 import { PagedData } from "src/models/PagedData";
 import { ShipmentDto } from "./dto/shipment.dto";
 import { Supplier } from "../supplier/supplier.entity";
 import { Employee } from "../employee/employee.entity";
 import { DetailShipment } from "../detail_shipment/detail_shipment.enitty";
+import { Material } from "../material/material.entity";
 
 @Injectable()
 export class ShipmentService {
   constructor(
     @Inject(SHIPMENT_REPOSITORY) private readonly shipmentRepository: typeof Shipment,
-    @Inject(DETAIL_SHIPMENT_REPOSITORY) private readonly detailShipmentRepository: typeof DetailShipment
+    @Inject(DETAIL_SHIPMENT_REPOSITORY) private readonly detailShipmentRepository: typeof DetailShipment,
+    @Inject(MATERIAL_REPOSITORY) private readonly materialRepository: typeof Material
   ) {}
   async get(pagination: any, filter: any): Promise<PagedData<Shipment>> {
     const { count, rows } = await this.shipmentRepository.findAndCountAll({
@@ -59,7 +61,14 @@ export class ShipmentService {
       });
       shipment.price = price;
       await this.detailShipmentRepository.bulkCreate(detail_shipments);
+
+      ///update amount material
+      infoCreate.lst_detail_shipment.forEach(async (item) => {
+        const material = await this.materialRepository.findByPk(item.id_material);
+        if (material) await material.update({ amount: material.amount + item.amount });
+      });
     }
+
     return await shipment.save();
   }
 
@@ -78,6 +87,12 @@ export class ShipmentService {
       editInfo.price = price;
       await this.detailShipmentRepository.destroy({ where: { id_shipment: shipment.id } });
       await this.detailShipmentRepository.bulkCreate(detail_shipments);
+
+      //update amount material
+      // editInfo.lst_detail_shipment.forEach(async (item) => {
+      //   const material = await this.materialRepository.findByPk(item.id_material);
+      //   if (material) await material.update({ amount: material.amount - item.old_amount + item.amount });
+      // });
     }
     return shipment.update(editInfo);
   }
