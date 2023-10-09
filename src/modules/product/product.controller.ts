@@ -18,7 +18,7 @@ export class ProductController {
   constructor(private readonly productService: ProductServices) {}
   @Get()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   async get(@Req() req: any, @Query() filter: ProductFilter, @Query() order?: ProductOrder) {
     const pagination = req.pagination;
     const data = await this.productService.get(pagination, filter, order);

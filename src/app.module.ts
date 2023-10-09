@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { databaseModule } from "./core/database/database.module";
@@ -37,6 +37,7 @@ import { CheckInventoryModule } from "./modules/check_inventory/check-inventory.
 import { TransformInterceptor } from "./Interceptors/tranform.interceptor";
 import { DTCheckInventorModule } from "./modules/detail-check-inventory/detail-check-inventor.module";
 import { InvoiceDetailModule } from "./modules/invoice_detail/invoice-detail.module";
+import { PaginationMiddleware } from "./middleware/paginantion.middleware";
 
 @Module({
   imports: [
@@ -99,4 +100,8 @@ import { InvoiceDetailModule } from "./modules/invoice_detail/invoice-detail.mod
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(PaginationMiddleware).forRoutes({ path: "*", method: RequestMethod.GET });
+  }
+}

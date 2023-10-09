@@ -15,7 +15,7 @@ export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
   async get(@Req() req: any, @Query("search") search: string, @Query("email") email: string) {
     const pagination = req.pagination;

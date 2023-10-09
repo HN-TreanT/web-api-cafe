@@ -14,7 +14,7 @@ export class TablefoodInoviceController {
   constructor(private readonly tablefoodInvoiceSerivce: TablefoodInoviceService) {}
   @Get("/")
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   async get(@Req() req: any) {
     const pagination = req.pagination;
     const data = await this.tablefoodInvoiceSerivce.get(pagination, {});
@@ -28,7 +28,7 @@ export class TablefoodInoviceController {
     return data;
   }
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
   async create(@Body() createInfo: TblInvoiceCreate) {
     const data = await this.tablefoodInvoiceSerivce.create(createInfo);
@@ -36,7 +36,7 @@ export class TablefoodInoviceController {
   }
 
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
   async edit(@Param("id") id: number, @Body() updateInfo: TblInvoiceEdit) {
     const data = await this.tablefoodInvoiceSerivce.edit(id, updateInfo);
@@ -44,7 +44,7 @@ export class TablefoodInoviceController {
   }
 
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")
   async deleteById(@Param("id") id: number) {
     await this.tablefoodInvoiceSerivce.deleteById(id);

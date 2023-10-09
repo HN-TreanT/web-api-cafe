@@ -14,7 +14,7 @@ export class DetailComboController {
   constructor(private readonly detailComboService: DetailComboService) {}
   @Get("/")
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   async get(@Req() req: any) {
     const pagination = req.pagination;
     const data = await this.detailComboService.get(pagination, {});

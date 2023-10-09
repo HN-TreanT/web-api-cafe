@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { PagedData } from "src/models/PagedData";
 import { DetailShipment } from "./detail_shipment.enitty";
-import { DETAIL_SHIPMENT_REPOSITORY, MATERIAL_REPOSITORY, SHIPMENT_REPOSITORY } from "src/constants/repository_enum";
+import { DETAIL_SHIPMENT_REPOSITORY, MATERIAL_REPOSITORY } from "src/constants/repository_enum";
 import { DetailShipmentCreate } from "./dto/detail-shipment-create.dto";
 import { DetailShipmentEdit } from "./dto/detail-shipment-edit";
 import { DetailShipmentFilter } from "./dto/detail-shipment-filter";

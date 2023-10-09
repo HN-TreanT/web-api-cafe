@@ -117,4 +117,6 @@ export class ShipmentService {
     await shipment.destroy();
     return true;
   }
+
+  async uploadFileExcel() {}
 }

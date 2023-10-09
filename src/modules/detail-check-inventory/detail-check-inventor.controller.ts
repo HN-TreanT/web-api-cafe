@@ -13,7 +13,7 @@ export class DetailCheckInventorContronller {
   constructor(private readonly _serivce: DtCheckInventorService) {}
 
   @Roles(ROLES.ADMIN)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
   async get(@Req() req: any, @Query("id_detail_check") id_detail_check: number) {
     const pagination = req.pagination;

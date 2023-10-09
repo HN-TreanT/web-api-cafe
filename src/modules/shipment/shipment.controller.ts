@@ -11,7 +11,7 @@ export class ShipmentController {
   constructor(private readonly shipmentService: ShipmentService) {}
   @Get("/")
   @Roles(ROLES.ADMIN)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   async get(@Req() req: any, @Query("search") search: string) {
     const pagination = req.pagination;
     const data = await this.shipmentService.get(pagination, search);

@@ -16,7 +16,7 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
   @Get("/")
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   async get(@Req() req: any, @Query("search") search: string) {
     const pagination = req.pagination;
     let filter = {};

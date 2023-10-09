@@ -14,7 +14,7 @@ export class TableController {
   constructor(private readonly tableSerivce: TableFoodService) {}
   @Get("/")
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   async get(@Req() req: any, @Query("search") search: string, @Query("status") status: number) {
     let filter: any = {};
     if (search) filter.name = { [Op.substring]: search };

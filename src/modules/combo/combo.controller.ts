@@ -16,7 +16,7 @@ export class ComboController {
   constructor(private readonly comboService: ComboService) {}
 
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
   async get(@Req() req: any, @Query("search") search: string) {
     const pagination = req.pagination;

@@ -14,7 +14,7 @@ export class InvoiceDetailController {
   constructor(private readonly invoiceDetailService: InvoiceDetailService) {}
   @Get("/")
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   async get(@Req() req: any, @Query() filter: DtInvoiceFilter) {
     const pagination = req.pagination;
     const data = await this.invoiceDetailService.get(pagination, filter);

@@ -16,7 +16,7 @@ export class PromotionController {
   constructor(private readonly promotionService: PromotionServices) {}
   @Get("/")
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   async get(@Req() req: any, @Query() filter: PromotionFilter) {
     let promotion_filter: any = {};
     const pagination = req.pagination;

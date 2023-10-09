@@ -14,7 +14,7 @@ import { ROLES } from "src/constants/role.enum";
 export class CheckInventoryController {
   constructor(private readonly checkInventorySerivce: CheckInventoryService) {}
   @Roles(ROLES.ADMIN)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
   async get(@Req() req: any, @Query() filter: CheckInventoryFilter) {
     const pagination = req.pagination;

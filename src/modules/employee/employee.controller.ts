@@ -13,7 +13,7 @@ export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
   @Roles(ROLES.ADMIN)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
   async get(@Req() req: any, @Query() filter: EmployeeFilter) {
     const pagination = req.pagination;

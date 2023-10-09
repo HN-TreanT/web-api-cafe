@@ -14,7 +14,7 @@ export class MaterialController {
   constructor(private readonly materialService: MaterialSerivce) {}
   @Get("/")
   @Roles(ROLES.ADMIN)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   async get(@Req() req: any, @Query("search") search: string, @Query() order: MaterialOrder) {
     const pagination = req.pagination;
     const data = await this.materialService.get(pagination, search, order);

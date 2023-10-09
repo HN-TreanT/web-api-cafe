@@ -13,7 +13,7 @@ export class SupplierController {
   constructor(private readonly supplierService: SupplierSerivce) {}
   @Get("/")
   @Roles(ROLES.ADMIN)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   async get(@Req() req: any, @Query("search") search: string) {
     const pagination = req.pagination;
     const data = await this.supplierService.get(pagination, search);

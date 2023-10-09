@@ -16,7 +16,7 @@ export class DetailShipmentController {
   constructor(private readonly detailShipmentService: DetailShipmentService) {}
 
   @Roles(ROLES.ADMIN)
-  @UseGuards(PaginationGuard, JwtAccessGuard, RolesGuard)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
   async get(@Req() req: any, @Query() filter: DetailShipmentFilter, @Query() order: DetailShipmentOrder) {
     const pagination = req.pagination;
