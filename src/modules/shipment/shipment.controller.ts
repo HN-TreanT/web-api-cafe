@@ -51,8 +51,8 @@ export class ShipmentController {
     return true;
   }
 
-  // @Roles(ROLES.ADMIN)
-  // @UseGuards(JwtAccessGuard, RolesGuard)
+  @Roles(ROLES.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @UseInterceptors(FileInterceptor("file"))
   @Post("/upload-excel")
   async uploadExcel(@UploadedFile() file: Express.Multer.File) {
