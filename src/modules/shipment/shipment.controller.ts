@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Param, Body, Query, UseGuards, Req, Delete } from "@nestjs/common";
+import { Controller, Get, Post, Put, Param, Body, Query, UseGuards, Req, Delete, UseInterceptors, UploadedFile } from "@nestjs/common";
 import { ShipmentService } from "./shipment.service";
 import { PaginationGuard } from "src/guards/pagination.guard";
 import { ShipmentDto } from "./dto/shipment.dto";
@@ -6,6 +6,7 @@ import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
 import { Roles } from "src/decorator/role.decorator";
 import { ROLES } from "src/constants/role.enum";
+import { FileInterceptor } from "@nestjs/platform-express";
 @Controller("shipment")
 export class ShipmentController {
   constructor(private readonly shipmentService: ShipmentService) {}
@@ -48,5 +49,14 @@ export class ShipmentController {
   async deleteById(@Param("id") id: number) {
     await this.shipmentService.deleteById(id);
     return true;
+  }
+
+  // @Roles(ROLES.ADMIN)
+  // @UseGuards(JwtAccessGuard, RolesGuard)
+  @UseInterceptors(FileInterceptor("file"))
+  @Post("/upload-excel")
+  async uploadExcel(@UploadedFile() file: Express.Multer.File) {
+    const res = await this.shipmentService.uploadFileExcel(file);
+    return res;
   }
 }

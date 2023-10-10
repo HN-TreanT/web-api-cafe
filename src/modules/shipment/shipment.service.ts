@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { DETAIL_SHIPMENT_REPOSITORY, MATERIAL_REPOSITORY, SHIPMENT_REPOSITORY } from "src/constants/repository_enum";
+import { DETAIL_SHIPMENT_REPOSITORY, MATERIAL_REPOSITORY, SHIPMENT_REPOSITORY, SUPPLIER_REPOSITORY } from "src/constants/repository_enum";
 import { Shipment } from "./shipment.entity";
 import { PagedData } from "src/models/PagedData";
 import { ShipmentDto } from "./dto/shipment.dto";
@@ -7,13 +7,16 @@ import { Supplier } from "../supplier/supplier.entity";
 import { Employee } from "../employee/employee.entity";
 import { DetailShipment } from "../detail_shipment/detail_shipment.enitty";
 import { Material } from "../material/material.entity";
+import * as xlsx from "xlsx";
+import { format, parse } from "date-fns";
 
 @Injectable()
 export class ShipmentService {
   constructor(
     @Inject(SHIPMENT_REPOSITORY) private readonly shipmentRepository: typeof Shipment,
     @Inject(DETAIL_SHIPMENT_REPOSITORY) private readonly detailShipmentRepository: typeof DetailShipment,
-    @Inject(MATERIAL_REPOSITORY) private readonly materialRepository: typeof Material
+    @Inject(MATERIAL_REPOSITORY) private readonly materialRepository: typeof Material,
+    @Inject(SUPPLIER_REPOSITORY) private readonly supllierRepository: typeof Supplier
   ) {}
   async get(pagination: any, filter: any): Promise<PagedData<Shipment>> {
     const { count, rows } = await this.shipmentRepository.findAndCountAll({
@@ -118,5 +121,62 @@ export class ShipmentService {
     return true;
   }
 
-  async uploadFileExcel() {}
+  async uploadFileExcel(file: Express.Multer.File) {
+    if (!file) throw new NotFoundException({ message: "not found file", status: false });
+
+    const workbook = xlsx.read(file.buffer);
+    const sheetNames = workbook.SheetNames[0];
+
+    const count_material = workbook.Sheets[sheetNames].E9.v;
+    const id_employee = workbook.Sheets[sheetNames].E7.v;
+    const supplier = {
+      name: workbook.Sheets[sheetNames].L6.v,
+      phone_number: workbook.Sheets[sheetNames].L7.v,
+      address: workbook.Sheets[sheetNames].L9.v,
+      email: workbook.Sheets[sheetNames].L8.v,
+    };
+
+    let supllier = await this.supllierRepository.findOne({
+      where: {
+        email: supplier.email,
+      },
+    });
+    if (!supllier) supllier = await this.supllierRepository.create(supplier);
+
+    let lst_detail_shipment: any = [];
+    for (let i = 13; i < 13 + count_material; i++) {
+      const name_material = workbook.Sheets[sheetNames][`B${i}`].v;
+      const unit_material = workbook.Sheets[sheetNames][`G${i}`].v;
+      const count_material = workbook.Sheets[sheetNames][`I${i}`].v;
+      const price_materila = workbook.Sheets[sheetNames][`M${i}`].v;
+      const expriation_date = workbook.Sheets[sheetNames][`O${i}`].v;
+      const format_date = parse(expriation_date, "dd/MM/yyyy", new Date());
+
+      const material = await this.materialRepository.findOne({ where: { name: name_material } });
+      if (!material) {
+        const new_materail = await this.materialRepository.create({ name: name_material, unit: unit_material, expriation_date: format_date });
+        lst_detail_shipment.push({
+          id_material: new_materail.id,
+          amount: count_material,
+          price: price_materila,
+          expiration_date: format_date,
+        });
+      } else {
+        lst_detail_shipment.push({
+          id_material: material.id,
+          amount: count_material,
+          price: price_materila,
+          expiration_date: format_date,
+        });
+      }
+    }
+
+    const data: ShipmentDto = {
+      id_employee: id_employee,
+      id_supplier: supllier.id,
+      price: 0,
+      lst_detail_shipment: lst_detail_shipment,
+    };
+    return await this.create(data);
+  }
 }
