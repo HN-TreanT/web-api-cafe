@@ -50,8 +50,8 @@ export class EmployeeService {
     const pageNumber = pagination.offset / pagination.limit + 1;
     const data = {
       CurrentPage: pageNumber,
-      TotalPage: count,
-      CanNext: pageNumber < count,
+      TotalPage: rows.length,
+      CanNext: pageNumber < rows.length,
       CanBack: pageNumber > 1,
       data: rows,
     };

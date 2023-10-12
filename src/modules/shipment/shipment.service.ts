@@ -30,9 +30,9 @@ export class ShipmentService {
         {
           model: Employee,
         },
-        {
-          model: DetailShipment,
-        },
+        // {
+        //   model: DetailShipment,
+        // },
       ],
     });
     const pageNumber = pagination.offset / pagination.limit + 1;

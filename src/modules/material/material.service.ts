@@ -5,9 +5,10 @@ import { PagedData } from "src/models/PagedData";
 import { DetailCheckInventory } from "../detail-check-inventory/detail_check-inventory.entity";
 import { MaterialCreate } from "./dto/material-create.dto";
 import { MaterialEdit } from "./dto/material-edit.dto";
-import { Op } from "sequelize";
+import { Model, Op } from "sequelize";
 import { MaterialOrder } from "./dto/material-order.dto";
 import { DetailShipment } from "../detail_shipment/detail_shipment.enitty";
+import { UseMaterial } from "../use_material/use_material.entity";
 @Injectable()
 export class MaterialSerivce {
   constructor(

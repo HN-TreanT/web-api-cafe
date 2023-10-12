@@ -86,18 +86,18 @@ export class InvoiceService {
               }
             : null,
         },
-        {
-          model: InvoiceDetail,
-          include: [Product, Combo],
-        },
+        // {
+        //   model: InvoiceDetail,
+        //   include: [Product, Combo],
+        // },
       ],
     });
 
     const pageNumber = pagination.offset / pagination.limit + 1;
     const data = {
       CurrentPage: pageNumber,
-      TotalPage: count,
-      CanNext: pageNumber < count,
+      TotalPage: rows.length,
+      CanNext: pageNumber < rows.length,
       CanBack: pageNumber > 1,
       data: rows,
     };
@@ -118,10 +118,10 @@ export class InvoiceService {
         {
           model: TableFoodInvoice,
         },
-        {
-          model: InvoiceDetail,
-          include: [Product, Combo],
-        },
+        // {
+        //   model: InvoiceDetail,
+        //   include: [Product, Combo],
+        // },
       ],
     });
     if (!invoice) throw new NotFoundException({ message: "not found invoice ", status: false });

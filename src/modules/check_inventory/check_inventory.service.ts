@@ -27,7 +27,7 @@ export class CheckInventoryService {
       },
       order: [["time_check", "DESC"]],
       ...pagination,
-      include: [{ model: DetailCheckInventory }],
+      // include: [{ model: DetailCheckInventory }],
     });
 
     const pageNumber = pagination.offset / pagination.limit + 1;
