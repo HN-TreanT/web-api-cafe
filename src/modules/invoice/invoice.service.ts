@@ -44,6 +44,7 @@ export class InvoiceService {
     private readonly tableInvoiceService: TablefoodInoviceService
   ) {}
 
+  ///nếu time_pay = null lấy ra những invoice chưa thanh toán , status : lấy ra những invoice đã được nhà bếp làm xong
   async get(pagination: any, filter: FilterDto, order: OrderInvoiceDto): Promise<PagedData<Invoice>> {
     let filterInvoice: any = {};
     let filterCustomer: any = {};
