@@ -32,6 +32,7 @@ import { format } from "date-fns";
 import { UseMaterial } from "../use_material/use_material.entity";
 import { DetailCombo } from "../detail_combo/detail_combo.entity";
 import { Material } from "../material/material.entity";
+import { raw } from "body-parser";
 
 @Injectable()
 export class InvoiceService {
@@ -72,12 +73,13 @@ export class InvoiceService {
           model: Employee,
           attributes: { exclude: ["password"] },
         },
-        { model: Promotion },
+        { model: Promotion, required: false },
         {
           model: Customer,
           where: {
             ...filterCustomer,
           },
+          required: false,
         },
         {
           model: TableFoodInvoice,
@@ -87,22 +89,17 @@ export class InvoiceService {
               }
             : null,
         },
-        // {
-        //   model: InvoiceDetail,
-        //   include: [Product, Combo],
-        // },
       ],
     });
-    const total = await this.tableFoodRepository.count({
+    const total = await this.invoiceRepository.count({
       where: { ...filterInvoice },
       include: [
         {
-          model: TableFoodInvoice,
-          where: filter.id_table
-            ? {
-                id_table: filter.id_table,
-              }
-            : null,
+          model: Customer,
+          where: {
+            ...filterCustomer,
+          },
+          required: false,
         },
       ],
     });
