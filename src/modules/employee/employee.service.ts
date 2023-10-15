@@ -46,12 +46,12 @@ export class EmployeeService {
         },
       ],
     });
-
+    const total = await this.employeeRepository.count({ where: { ...filterData } });
     const pageNumber = pagination.offset / pagination.limit + 1;
     const data = {
       CurrentPage: pageNumber,
-      TotalPage: rows.length,
-      CanNext: pageNumber < rows.length,
+      TotalPage: total,
+      CanNext: pageNumber < total,
       CanBack: pageNumber > 1,
       data: rows,
     };

@@ -8,8 +8,10 @@ import { DetailComboEdit } from "./dto/detailcombo-edit.dto";
 export class DetailComboService {
   constructor(@Inject(DETAIL_COMBO_REPOSITORY) private readonly detailComboRepository: typeof DetailCombo) {}
   async get(pagination: any, filter: any): Promise<PagedData<DetailCombo>> {
+    let filterData: any = {};
+    if (filter.id_combo) filterData.id_combo = filter.id_combo;
     const { count, rows } = await this.detailComboRepository.findAndCountAll({
-      where: { ...filter },
+      where: { ...filterData },
       ...pagination,
     });
     const pageNumber = pagination.offset / pagination.limit + 1;

@@ -28,11 +28,12 @@ export class ComboService {
       ],
     });
 
+    const total = await this.comboRepository.count({ where: { ...filter } });
     const pageNumber = pagination.offset / pagination.limit + 1;
     const data = {
       CurrentPage: pageNumber,
-      TotalPage: rows.length,
-      CanNext: pageNumber < rows.length,
+      TotalPage: total,
+      CanNext: pageNumber < total,
       CanBack: pageNumber > 1,
       data: rows,
     };

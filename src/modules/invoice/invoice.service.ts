@@ -93,12 +93,25 @@ export class InvoiceService {
         // },
       ],
     });
+    const total = await this.tableFoodRepository.count({
+      where: { ...filterInvoice },
+      include: [
+        {
+          model: TableFoodInvoice,
+          where: filter.id_table
+            ? {
+                id_table: filter.id_table,
+              }
+            : null,
+        },
+      ],
+    });
 
     const pageNumber = pagination.offset / pagination.limit + 1;
     const data = {
       CurrentPage: pageNumber,
-      TotalPage: rows.length,
-      CanNext: pageNumber < rows.length,
+      TotalPage: total,
+      CanNext: pageNumber < total,
       CanBack: pageNumber > 1,
       data: rows,
     };
