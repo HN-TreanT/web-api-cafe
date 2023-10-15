@@ -59,11 +59,11 @@ export const databaseConfig: IDatabaseConfig = {
 
     //mysql railway
 
-    username: "root",
-    password: "7yYRHlkPO6m8K648v0Ut",
-    database: "railway",
-    host: "containers-us-west-171.railway.app",
-    port: 7930,
+    username: "ul71ctbbceafevp7",
+    password: "jSEcatyfs2hr4kowjCdY",
+    database: "bemnn0vlkcwd9rou1es9",
+    host: "bemnn0vlkcwd9rou1es9-mysql.services.clever-cloud.com",
+    port: 3306,
     dialect: "mysql",
 
     dialectOptions: {
