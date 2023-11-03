@@ -2,12 +2,11 @@ import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from "@nest
 import { AuthService } from "./auth.service";
 import RegisterInfo from "./dto/register-info";
 import { LocalAuthGuard } from "src/guards/local.guard";
-import { JwtAccessGuard } from "src/guards/jwt-access.guard";
-import { RolesGuard } from "src/guards/role.guard";
-import { Roles } from "src/decorator/role.decorator";
 import InfoChangePassword from "./dto/info-change-password.dto";
 import { JwtRefreshGuard } from "src/guards/jwt-refresh.guard";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('auth')
 @Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

@@ -10,10 +10,12 @@ import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
 import { Roles } from "src/decorator/role.decorator";
 import { ROLES } from "src/constants/role.enum";
-
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
+@ApiTags('category')
 @Controller("category")
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
+  @ApiBearerAuth()
   @Get("/")
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
@@ -26,7 +28,7 @@ export class CategoryController {
     const data = await this.categoryService.get(pagination, filter);
     return data;
   }
-
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -35,6 +37,7 @@ export class CategoryController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -43,6 +46,7 @@ export class CategoryController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -51,6 +55,7 @@ export class CategoryController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")

@@ -11,10 +11,14 @@ import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
 import { Roles } from "src/decorator/role.decorator";
 import { ROLES } from "src/constants/role.enum";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+
+@ApiTags('detail-shipment')
 @Controller("detail-shipment")
 export class DetailShipmentController {
   constructor(private readonly detailShipmentService: DetailShipmentService) {}
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
@@ -24,6 +28,7 @@ export class DetailShipmentController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -32,6 +37,7 @@ export class DetailShipmentController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -40,6 +46,7 @@ export class DetailShipmentController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -48,6 +55,7 @@ export class DetailShipmentController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")

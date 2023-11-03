@@ -8,10 +8,14 @@ import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
 import { Roles } from "src/decorator/role.decorator";
 import { ROLES } from "src/constants/role.enum";
+import { ApiTags , ApiBearerAuth} from "@nestjs/swagger";
 
+@ApiTags('table-food')
 @Controller("table-food")
 export class TableController {
   constructor(private readonly tableSerivce: TableFoodService) {}
+
+  @ApiBearerAuth()
   @Get("/")
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
@@ -24,6 +28,7 @@ export class TableController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -32,6 +37,7 @@ export class TableController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post("")
@@ -40,6 +46,7 @@ export class TableController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -48,6 +55,7 @@ export class TableController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")

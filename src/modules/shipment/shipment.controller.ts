@@ -7,9 +7,14 @@ import { RolesGuard } from "src/guards/role.guard";
 import { Roles } from "src/decorator/role.decorator";
 import { ROLES } from "src/constants/role.enum";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+
+@ApiTags('shipment')
 @Controller("shipment")
 export class ShipmentController {
   constructor(private readonly shipmentService: ShipmentService) {}
+
+  @ApiBearerAuth()
   @Get("/")
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
@@ -19,6 +24,7 @@ export class ShipmentController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -27,6 +33,7 @@ export class ShipmentController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -35,6 +42,7 @@ export class ShipmentController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -43,6 +51,7 @@ export class ShipmentController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")
@@ -51,6 +60,7 @@ export class ShipmentController {
     return true;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @UseInterceptors(FileInterceptor("file"))

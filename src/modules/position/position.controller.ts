@@ -20,16 +20,22 @@ import { Roles } from "src/decorator/role.decorator";
 import { ROLES } from "src/constants/role.enum";
 import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiTags('position')
 @Controller("position")
 export class PositionController {
   constructor(@Inject(POSITION_REPOSITORY) private readonly positionRepository: typeof Position) {}
+
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post("/")
   async create(@Body() positionCreate: PositionCreate) {
     return await this.positionRepository.create(positionCreate);
   }
+
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
@@ -40,6 +46,7 @@ export class PositionController {
     return rows;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -56,6 +63,7 @@ export class PositionController {
   //   return role;
   // }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")

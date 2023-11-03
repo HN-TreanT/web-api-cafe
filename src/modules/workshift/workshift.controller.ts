@@ -5,11 +5,14 @@ import { Roles } from "src/decorator/role.decorator";
 import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
 import { ROLES } from "src/constants/role.enum";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 
+@ApiTags('workshift')
 @Controller("workshift")
 export class WorkshiftController {
   constructor(private readonly workshiftService: WorkshiftServices) {}
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
@@ -18,6 +21,7 @@ export class WorkshiftController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -26,6 +30,7 @@ export class WorkshiftController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -34,6 +39,7 @@ export class WorkshiftController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -42,6 +48,7 @@ export class WorkshiftController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")

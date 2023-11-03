@@ -7,11 +7,15 @@ import { Roles } from "src/decorator/role.decorator";
 import { ROLES } from "src/constants/role.enum";
 import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+
+@ApiTags('detail-check-inventor')
 @Controller("detail-check-inventor")
 export class DetailCheckInventorContronller {
   constructor(private readonly _serivce: DtCheckInventorService) {}
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
@@ -24,6 +28,7 @@ export class DetailCheckInventorContronller {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -32,6 +37,7 @@ export class DetailCheckInventorContronller {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -40,6 +46,7 @@ export class DetailCheckInventorContronller {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -48,6 +55,7 @@ export class DetailCheckInventorContronller {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")

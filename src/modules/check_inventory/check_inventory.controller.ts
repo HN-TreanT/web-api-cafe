@@ -9,10 +9,13 @@ import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
 import { Roles } from "src/decorator/role.decorator";
 import { ROLES } from "src/constants/role.enum";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 
+@ApiTags('check-inventory')
 @Controller("check-inventory")
 export class CheckInventoryController {
   constructor(private readonly checkInventorySerivce: CheckInventoryService) {}
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
@@ -23,6 +26,7 @@ export class CheckInventoryController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -31,6 +35,7 @@ export class CheckInventoryController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -39,6 +44,7 @@ export class CheckInventoryController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -47,6 +53,7 @@ export class CheckInventoryController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")
@@ -55,6 +62,7 @@ export class CheckInventoryController {
     return true;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/synchronized-warehouse/:id")

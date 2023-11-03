@@ -10,11 +10,14 @@ import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
 import { Roles } from "src/decorator/role.decorator";
 import { ROLES } from "src/constants/role.enum";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 
+@ApiTags('combo')
 @Controller("combo")
 export class ComboController {
   constructor(private readonly comboService: ComboService) {}
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
@@ -29,6 +32,7 @@ export class ComboController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -45,6 +49,7 @@ export class ComboController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -53,6 +58,7 @@ export class ComboController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")
@@ -61,6 +67,7 @@ export class ComboController {
     return true;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post("/check-valid-material")

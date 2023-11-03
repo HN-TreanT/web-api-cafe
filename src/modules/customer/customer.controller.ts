@@ -9,11 +9,14 @@ import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
 import { ROLES } from "src/constants/role.enum";
 import { Roles } from "src/decorator/role.decorator";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 
+@ApiTags('customer')
 @Controller("customer")
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
@@ -31,6 +34,7 @@ export class CustomerController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -39,6 +43,7 @@ export class CustomerController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -47,6 +52,7 @@ export class CustomerController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -55,6 +61,7 @@ export class CustomerController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")

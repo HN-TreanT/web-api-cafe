@@ -9,9 +9,14 @@ import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
 import { Roles } from "src/decorator/role.decorator";
 import { ROLES } from "src/constants/role.enum";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+
+@ApiTags('material')
 @Controller("material")
 export class MaterialController {
   constructor(private readonly materialService: MaterialSerivce) {}
+
+  @ApiBearerAuth()
   @Get("/")
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
@@ -21,6 +26,7 @@ export class MaterialController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -29,6 +35,7 @@ export class MaterialController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post("")
@@ -37,6 +44,7 @@ export class MaterialController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -45,6 +53,7 @@ export class MaterialController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")

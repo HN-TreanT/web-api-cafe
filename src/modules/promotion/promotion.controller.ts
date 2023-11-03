@@ -10,10 +10,14 @@ import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { Roles } from "src/decorator/role.decorator";
 import { ROLES } from "src/constants/role.enum";
 import { RolesGuard } from "src/guards/role.guard";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiTags('promotion')
 @Controller("promotion")
 export class PromotionController {
   constructor(private readonly promotionService: PromotionServices) {}
+
+  @ApiBearerAuth()
   @Get("/")
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
@@ -27,6 +31,8 @@ export class PromotionController {
     return data;
   }
 
+
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -35,6 +41,7 @@ export class PromotionController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -43,6 +50,7 @@ export class PromotionController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -50,6 +58,8 @@ export class PromotionController {
     const data = await this.promotionService.edit(id, promotionEdit);
     return data;
   }
+
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")

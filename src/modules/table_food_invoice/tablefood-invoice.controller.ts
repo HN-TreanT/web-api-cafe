@@ -8,10 +8,14 @@ import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { ROLES } from "src/constants/role.enum";
 import { Roles } from "src/decorator/role.decorator";
 import { RolesGuard } from "src/guards/role.guard";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 
+@ApiTags("tablefood-invoice")
 @Controller("tablefood-invoice")
 export class TablefoodInoviceController {
   constructor(private readonly tablefoodInvoiceSerivce: TablefoodInoviceService) {}
+
+  @ApiBearerAuth()
   @Get("/")
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
@@ -20,6 +24,8 @@ export class TablefoodInoviceController {
     const data = await this.tablefoodInvoiceSerivce.get(pagination, {});
     return data;
   }
+
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -27,6 +33,8 @@ export class TablefoodInoviceController {
     const data = await this.tablefoodInvoiceSerivce.getById(id);
     return data;
   }
+
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -35,6 +43,7 @@ export class TablefoodInoviceController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -43,6 +52,7 @@ export class TablefoodInoviceController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")

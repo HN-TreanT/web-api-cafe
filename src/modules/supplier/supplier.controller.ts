@@ -7,10 +7,14 @@ import { ROLES } from "src/constants/role.enum";
 import { Roles } from "src/decorator/role.decorator";
 import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 
+@ApiTags('supplier')
 @Controller("supplier")
 export class SupplierController {
   constructor(private readonly supplierService: SupplierSerivce) {}
+
+  @ApiBearerAuth()
   @Get("/")
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
@@ -20,6 +24,7 @@ export class SupplierController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -28,6 +33,7 @@ export class SupplierController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -36,6 +42,7 @@ export class SupplierController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -44,6 +51,7 @@ export class SupplierController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")

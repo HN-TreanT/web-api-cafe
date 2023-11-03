@@ -7,11 +7,14 @@ import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { ROLES } from "src/constants/role.enum";
 import { Roles } from "src/decorator/role.decorator";
 import { RolesGuard } from "src/guards/role.guard";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiTags('employee')
 @Controller("employee")
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
@@ -21,6 +24,7 @@ export class EmployeeController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -29,6 +33,7 @@ export class EmployeeController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -37,6 +42,7 @@ export class EmployeeController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")

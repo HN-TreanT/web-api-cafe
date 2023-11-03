@@ -14,11 +14,14 @@ import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { ROLES } from "src/constants/role.enum";
 import { RolesGuard } from "src/guards/role.guard";
 import { Roles } from "src/decorator/role.decorator";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiTags("invoice")
 @Controller("invoice")
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/")
@@ -28,6 +31,7 @@ export class InvoiceController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -36,6 +40,7 @@ export class InvoiceController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -44,6 +49,7 @@ export class InvoiceController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -52,6 +58,7 @@ export class InvoiceController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")
@@ -60,6 +67,7 @@ export class InvoiceController {
     return true;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post("/split-order")
@@ -67,6 +75,7 @@ export class InvoiceController {
     return await this.invoiceService.splitInvoice(splitInvoice);
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAccessGuard)
   @Post("/combine-inovice")
   async combineInvoice(@Query("isCombineTable") isCombineTable: boolean, @Body() combineInvoice: CombineInvoice) {
@@ -77,6 +86,7 @@ export class InvoiceController {
     return await this.invoiceService.combineInvocie(check, combineInvoice);
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAccessGuard)
   @Post("/payment/:invoice_id")
   async payment(@Param("invoice_id") invoice_id: number, @Body() paymentInfo: Payment) {
@@ -84,6 +94,7 @@ export class InvoiceController {
     return await this.invoiceService.payment(invoice_id, paymentInfo);
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAccessGuard)
   @Get("/complete-invoice/:id")
   async test(@Param("id") id: number) {

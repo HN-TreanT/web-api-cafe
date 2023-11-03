@@ -12,10 +12,14 @@ import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
 import { Roles } from "src/decorator/role.decorator";
 import { ROLES } from "src/constants/role.enum";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiTags('product')
 @Controller("product")
 export class ProductController {
   constructor(private readonly productService: ProductServices) {}
+
+  @ApiBearerAuth()
   @Get()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
@@ -25,6 +29,7 @@ export class ProductController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -33,6 +38,7 @@ export class ProductController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @UseInterceptors(FileInterceptor("image"))
@@ -42,6 +48,7 @@ export class ProductController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @UseInterceptors(FileInterceptor("image"))
@@ -51,6 +58,7 @@ export class ProductController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")
@@ -59,6 +67,7 @@ export class ProductController {
     return true;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post("/check-valid-material")

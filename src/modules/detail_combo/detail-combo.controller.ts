@@ -9,9 +9,14 @@ import { JwtAccessGuard } from "src/guards/jwt-access.guard";
 import { RolesGuard } from "src/guards/role.guard";
 import { ROLES } from "src/constants/role.enum";
 import { Roles } from "src/decorator/role.decorator";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+
+@ApiTags('detail-combo')
 @Controller("detail-combo")
 export class DetailComboController {
   constructor(private readonly detailComboService: DetailComboService) {}
+
+  @ApiBearerAuth()
   @Get("/")
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
@@ -21,6 +26,7 @@ export class DetailComboController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
@@ -29,6 +35,7 @@ export class DetailComboController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Post()
@@ -37,6 +44,7 @@ export class DetailComboController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
@@ -45,6 +53,7 @@ export class DetailComboController {
     return data;
   }
 
+  @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
   @Delete("/:id")
