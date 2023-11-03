@@ -1,9 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CheckInventoryFilter {
-  @ApiProperty()
+  @ApiProperty({required:false})
   time_start: Date;
 
-  @ApiProperty()
+  @ApiProperty({required:false})
   time_end: Date;
 }

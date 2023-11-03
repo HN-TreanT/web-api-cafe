@@ -11,5 +11,6 @@ export class ComboCreate {
   @IsNotEmpty()
   price: number;
 
+  @ApiProperty({type: [DetailComboEdit]})
   id_products: DetailComboEdit[];
 }

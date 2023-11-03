@@ -17,7 +17,7 @@ export class InoviceEdit {
   @ApiProperty()
   price: number;
 
-  @ApiProperty()
+  @ApiProperty({type : [InvoiceDetailEdit]})
   lst_invoice_detail: InvoiceDetailEdit[];
 
   @ApiProperty()

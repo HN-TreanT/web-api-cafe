@@ -1,10 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class OrderInvoiceDto {
-  @ApiProperty()
+  @ApiProperty({required:false})
   order_price: string;
-  @ApiProperty()
+  @ApiProperty({required:false})
   order_time_pay: string;
-  @ApiProperty()
+  @ApiProperty({required:false})
   createdAt: string;
 }

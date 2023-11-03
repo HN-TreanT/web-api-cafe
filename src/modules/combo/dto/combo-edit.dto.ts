@@ -9,6 +9,6 @@ export class ComboEdit {
   @ApiProperty()
   price: number;
 
-  @ApiProperty()
+  @ApiProperty({type: [DetailComboEdit]})
   id_products: DetailComboEdit[];
 }

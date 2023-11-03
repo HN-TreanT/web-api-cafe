@@ -2,9 +2,9 @@ import { ApiProperty } from "@nestjs/swagger";
 import { OrderEnum } from "src/constants/order.enum";
 
 export class MaterialOrder {
-  @ApiProperty()
+  @ApiProperty({required:false})
   order_name: OrderEnum;
 
-  @ApiProperty()
+  @ApiProperty({required:false})
   order_amount: OrderEnum;
 }

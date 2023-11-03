@@ -25,6 +25,6 @@ export class ProductCreate {
   @IsNotEmpty()
   id_category: number;
 
-  @ApiProperty()
+  @ApiProperty({type: [UseMaterialEdit]})
   lst_use_material: UseMaterialEdit[];
 }

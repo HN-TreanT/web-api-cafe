@@ -8,7 +8,7 @@ export class SplitInvoice {
   @IsNotEmpty()
   id_old_order: number;
 
-  @ApiProperty()
+  @ApiProperty({type: [InvoiceDetailEdit]})
   lst_inovice_detail: InvoiceDetailEdit[];
 
   @ApiProperty()

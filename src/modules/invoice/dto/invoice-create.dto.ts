@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { InvoiceDetailEdit } from "src/modules/invoice_detail/dto/invoice-detail-edit";
 
 export class InvoiceCreate {
-  @ApiProperty()
+  @ApiProperty({required:false})
   id_employee: number;
   @ApiProperty()
   id_customer: number;

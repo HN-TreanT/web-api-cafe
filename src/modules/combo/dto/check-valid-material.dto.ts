@@ -1,8 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CheckValidMaterial {
-  @ApiProperty()
+  @ApiProperty({required:true})
   id_combo: number;
-  @ApiProperty()
+  @ApiProperty({required:true})
   amount: number;
 }

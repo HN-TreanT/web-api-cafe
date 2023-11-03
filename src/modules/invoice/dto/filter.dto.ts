@@ -1,24 +1,24 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class FilterDto {
-  @ApiProperty()
+  @ApiProperty({required:false})
   id_employee: string;
-  @ApiProperty()
+  @ApiProperty({required:false})
   id_customer: string;
-  @ApiProperty()
+  @ApiProperty({required:false})
   id_promotion: string;
-  @ApiProperty()
+  @ApiProperty({required:false})
   name_customer: string;
-  @ApiProperty()
+  @ApiProperty({required:false})
   status: number;
-  @ApiProperty()
+  @ApiProperty({required:false})
   phone_number: string;
-  @ApiProperty()
+  @ApiProperty({required:false})
   email: string;
-  @ApiProperty()
+  @ApiProperty({required:false})
   id_table: string;
-  @ApiProperty()
+  @ApiProperty({required:false})
   time_start: Date;
-  @ApiProperty()
+  @ApiProperty({required:false})
   time_end: Date;
 }

@@ -30,6 +30,6 @@ export class ShipmentDto {
   @ApiProperty()
   price: number;
 
-  @ApiProperty()
+  @ApiProperty({type: [DetailShipmentEdit]})
   lst_detail_shipment: DetailShipmentEdit[];
 }

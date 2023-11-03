@@ -1,8 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class PromotionFilter {
-  @ApiProperty()
+  @ApiProperty({required:false})
   name: string;
-  @ApiProperty()
+  @ApiProperty({required:false})
   condition: number;
 }

@@ -1,9 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class ProductFilter {
-  @ApiProperty()
+  @ApiProperty({required:false})
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({required:false})
   id_category: number;
 }
