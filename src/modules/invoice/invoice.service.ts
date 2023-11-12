@@ -144,7 +144,6 @@ export class InvoiceService {
     let invoice_details: any = [];
     let table_food_invoices: TblInvoiceCreate[];
     let price: number = 0;
-    //create invoice detail
     if (infoCreate.lst_invoice_detail) {
       invoice_details = infoCreate.lst_invoice_detail.map((item) => {
         price = price + item.price;
@@ -153,7 +152,7 @@ export class InvoiceService {
           id_invoice: invoice.id,
         };
       });
-      await this.tableInvoiceService.createMany(table_food_invoices);
+      await this.invoiceDetaiRepository.bulkCreate(invoice_details);
     }
     //create table_invoice
     if (infoCreate.id_tables) {
@@ -163,8 +162,8 @@ export class InvoiceService {
           id_invoice: invoice.id,
         };
       });
-
-      await this.invoiceDetaiRepository.bulkCreate(invoice_details);
+      await this.tableInvoiceService.createMany(table_food_invoices);
+      
     }
 
     invoice.price = price;
