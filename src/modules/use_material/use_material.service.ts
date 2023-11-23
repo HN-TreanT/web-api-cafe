@@ -5,6 +5,8 @@ import { PagedData } from "src/models/PagedData";
 import { UseMaterialCreate } from "./dto/use-material-create.dto";
 import { UseMaterialEdit } from "./dto/use-material-edit.dto";
 import { Worker } from "cluster";
+import { Material } from "../material/material.entity";
+import { Product } from "../product/product.entity";
 
 @Injectable()
 export class UseMaterialService {
@@ -13,6 +15,14 @@ export class UseMaterialService {
     const { count, rows } = await this.useMaterialRepository.findAndCountAll({
       where: { ...filter },
       ...pagination,
+      include: [
+        {
+          model: Material,
+        },
+        {
+          model: Product,
+        },
+      ],
     });
 
     const pageNumber = pagination.offset / pagination.limit + 1;

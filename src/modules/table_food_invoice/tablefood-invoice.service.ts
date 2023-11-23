@@ -4,6 +4,8 @@ import { TableFoodInvoice } from "./table_food_invoice.entity";
 import { PagedData } from "src/models/PagedData";
 import { TblInvoiceCreate } from "./dto/tbf-invoice-create";
 import { TblInvoiceEdit } from "./dto/tbl-inovice-edit.dto";
+import { TableFood } from "../table_food/table_food.entity";
+import { Invoice } from "../invoice/invoice.entity";
 
 @Injectable()
 export class TablefoodInoviceService {
@@ -12,6 +14,14 @@ export class TablefoodInoviceService {
     const { count, rows } = await this._repository.findAndCountAll({
       where: { ...filter },
       ...pagination,
+      include: [
+        {
+          model: TableFood,
+        },
+        {
+          model: Invoice,
+        },
+      ],
     });
 
     const pageNumber = pagination.offset / pagination.limit + 1;

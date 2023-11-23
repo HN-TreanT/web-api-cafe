@@ -8,6 +8,7 @@ import { DetailShipmentFilter } from "./dto/detail-shipment-filter";
 import { Op, Sequelize } from "sequelize";
 import { Material } from "../material/material.entity";
 import { DetailShipmentOrder } from "./dto/detail-shipment-order";
+import { Shipment } from "../shipment/shipment.entity";
 @Injectable()
 export class DetailShipmentService {
   constructor(
@@ -26,7 +27,7 @@ export class DetailShipmentService {
       where: { ...filterData },
       order: [...orderData],
       ...pagination,
-      include: [{ model: Material, where: { ...filterWithMaterial } }],
+      include: [{ model: Material, where: { ...filterWithMaterial } }, { model: Shipment }],
     });
     const pageNumber = pagination.offset / pagination.limit + 1;
     const data = {

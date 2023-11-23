@@ -4,6 +4,8 @@ import { DetailCombo } from "./detail_combo.entity";
 import { PagedData } from "src/models/PagedData";
 import { DetailComboCreate } from "./dto/detailcobom-create.dto";
 import { DetailComboEdit } from "./dto/detailcombo-edit.dto";
+import { Combo } from "../combo/combo.entity";
+import { Product } from "../product/product.entity";
 @Injectable()
 export class DetailComboService {
   constructor(@Inject(DETAIL_COMBO_REPOSITORY) private readonly detailComboRepository: typeof DetailCombo) {}
@@ -13,6 +15,8 @@ export class DetailComboService {
     const { count, rows } = await this.detailComboRepository.findAndCountAll({
       where: { ...filterData },
       ...pagination,
+      include: [{ model: Combo }, { model: Product }],
+
     });
     const pageNumber = pagination.offset / pagination.limit + 1;
     const data = {
