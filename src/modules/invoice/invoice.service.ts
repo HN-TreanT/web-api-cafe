@@ -88,6 +88,7 @@ export class InvoiceService {
                 id_table: filter.id_table,
               }
             : null,
+            required:false
         },
       ],
     });
