@@ -73,13 +73,15 @@ export class InvoiceService {
           model: Employee,
           attributes: { exclude: ["password"] },
         },
-        { model: Promotion, required: false },
+        { model: Promotion, 
+          // required: false 
+        },
         {
           model: Customer,
           where: {
             ...filterCustomer,
           },
-          required: false,
+          // required: false,
         },
         {
           model: TableFoodInvoice,
@@ -100,7 +102,7 @@ export class InvoiceService {
           where: {
             ...filterCustomer,
           },
-          required: false,
+          // required: false,
         },
       ],
     });

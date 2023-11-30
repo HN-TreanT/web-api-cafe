@@ -27,7 +27,9 @@ export class DetailShipmentService {
       where: { ...filterData },
       order: [...orderData],
       ...pagination,
-      include: [{ model: Material, where: { ...filterWithMaterial }, required: false }, { model: Shipment }],
+      include: [{ model: Material, where: { ...filterWithMaterial },
+        //  required: false
+         }, { model: Shipment }],
     });
     const pageNumber = pagination.offset / pagination.limit + 1;
     const data = {
