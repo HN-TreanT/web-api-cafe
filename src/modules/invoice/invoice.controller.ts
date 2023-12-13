@@ -34,6 +34,15 @@ export class InvoiceController {
   @ApiBearerAuth()
   @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
   @UseGuards(JwtAccessGuard, RolesGuard)
+  @Get("/detail-by-id-table/:id_table")
+  async getDetailInvoiceByIdTable(@Param("id_table") id_table: any,) {
+    const data = await this.invoiceService.getDetailInvoiceByIdTable(id_table);
+    return data;
+  }
+
+  @ApiBearerAuth()
+  @Roles(ROLES.ADMIN, ROLES.MANGER, ROLES.USER)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Get("/:id")
   async getById(@Param("id") id: number) {
     const data = await this.invoiceService.getById(id);

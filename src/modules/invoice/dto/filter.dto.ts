@@ -21,4 +21,6 @@ export class FilterDto {
   time_start: Date;
   @ApiProperty({required:false})
   time_end: Date;
+  @ApiProperty({required:false})
+  thanh_toan: string;
 }

@@ -45,20 +45,52 @@ export class InvoiceService {
     private readonly tableInvoiceService: TablefoodInoviceService
   ) {}
 
+  async getDetailInvoiceByIdTable(id_table: any) {
+   
+     const invoice = await this.invoiceRepository.findOne({
+      where: {
+        time_pay: null
+      },
+      include: [
+        {
+          model: Employee,
+          attributes: { exclude: ["password"] },
+        },
+        { model: Promotion, 
+        },
+        {
+          model: Customer,
+        },
+       {
+        model: InvoiceDetail
+       },
+       {
+        model: TableFoodInvoice,
+        where: {
+          id_table: id_table
+        }
+       }
+       
+      ]
+     })
+
+     if(!invoice) throw new NotFoundException({ message: "Không tìm thấy yêu cầu hợp lệ", status: false });
+
+     return invoice
+      
+  }
+
   ///nếu time_pay = null lấy ra những invoice chưa thanh toán , status : lấy ra những invoice đã được nhà bếp làm xong
   async get(pagination: any, filter: FilterDto, order: OrderInvoiceDto): Promise<PagedData<Invoice>> {
     let filterInvoice: any = {};
-    let filterCustomer: any = {};
     let orderInvoice: any = [];
     if (filter.id_customer) filterInvoice.id_customer = filter.id_customer;
     if (filter.id_employee) filterInvoice.id_employee = filter.id_employee;
     if (filter.id_promotion) filterInvoice.id_promotion = filter.id_promotion;
     if (filter.status) filterInvoice.status = filter.status;
+     if(filter?.thanh_toan === "chua") filterInvoice.time_pay = null; 
     if (filter.time_start && filter.time_end) filterInvoice.createdAt = { [Op.between]: [filter.time_start, filter.time_end] };
 
-    if (filter.name_customer) filterCustomer.name = { [Op.substring]: filter.name_customer };
-    if (filter.email) filterCustomer.email = filter.email;
-    if (filter.phone_number) filterCustomer.phone_number = filter.phone_number;
 
     if (order.createdAt) orderInvoice = [...orderInvoice, ["createdAt", `${order.createdAt}`]];
     if (order.order_price) orderInvoice = [...orderInvoice, ["price", `${order.order_price}`]];
@@ -74,14 +106,11 @@ export class InvoiceService {
           attributes: { exclude: ["password"] },
         },
         { model: Promotion, 
-          // required: false 
+        
         },
         {
           model: Customer,
-          where: {
-            ...filterCustomer,
-          },
-          // required: false,
+      
         },
         {
           model: TableFoodInvoice,
@@ -89,22 +118,13 @@ export class InvoiceService {
             ? {
                 id_table: filter.id_table,
               }
-            : null,
-            required:false
+            : {},
+            // required:false
         },
       ],
     });
     const total = await this.invoiceRepository.count({
       where: { ...filterInvoice },
-      include: [
-        {
-          model: Customer,
-          where: {
-            ...filterCustomer,
-          },
-          // required: false,
-        },
-      ],
     });
 
     const pageNumber = pagination.offset / pagination.limit + 1;
