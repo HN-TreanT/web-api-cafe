@@ -47,7 +47,7 @@ export class UseMaterialController {
   @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
-  @Post()
+  @Post("/createMany")
   async createMany(@Body() createInfo: UseMaterialCreate[]) {
     const data = await this.useMaterialService.createMany(createInfo);
     return data;
