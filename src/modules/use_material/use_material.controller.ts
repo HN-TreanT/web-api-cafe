@@ -47,6 +47,15 @@ export class UseMaterialController {
   @ApiBearerAuth()
   @Roles(ROLES.ADMIN)
   @UseGuards(JwtAccessGuard, RolesGuard)
+  @Post()
+  async createMany(@Body() createInfo: UseMaterialCreate[]) {
+    const data = await this.useMaterialService.createMany(createInfo);
+    return data;
+  }
+
+  @ApiBearerAuth()
+  @Roles(ROLES.ADMIN)
+  @UseGuards(JwtAccessGuard, RolesGuard)
   @Put("/:id")
   async edit(@Param("id") id: number, @Body() updateInfo: UseMaterialEdit) {
     const data = await this.useMaterialService.edit(id, updateInfo);
@@ -61,4 +70,6 @@ export class UseMaterialController {
     await this.useMaterialService.deleteById(id);
     return true;
   }
+
+
 }

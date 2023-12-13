@@ -45,6 +45,11 @@ export class UseMaterialService {
     return await this.useMaterialRepository.create(infoCreate);
   }
 
+  async createMany(infoCreate: UseMaterialCreate[]): Promise<any> {
+    const data = await this.useMaterialRepository.bulkCreate(infoCreate);
+    return data
+  }
+
   async edit(id: number, infoEdit: UseMaterialEdit) {
     const use_material = await this.useMaterialRepository.findByPk(id);
     if (!use_material) throw new NotFoundException({ message: "not found ", status: false });
