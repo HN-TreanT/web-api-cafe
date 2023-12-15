@@ -45,7 +45,7 @@ export class InvoiceService {
     private readonly tableInvoiceService: TablefoodInoviceService
   ) {}
 
-  async getDetailInvoiceByIdTable(id_table: any) {
+  async getDetailInvoiceByIdTable(id_table: any) : Promise<any>{
    
      const invoice = await this.invoiceRepository.findOne({
       where: {
@@ -62,21 +62,43 @@ export class InvoiceService {
           model: Customer,
         },
        {
-        model: InvoiceDetail
+        model: InvoiceDetail,
+        include: [Combo, Product]
        },
        {
         model: TableFoodInvoice,
         where: {
-          id_table: id_table
-        }
-       }
+          id_table: id_table,
+          
+        },
+        // required:false
+       },
+      
        
       ]
-     })
+     }).then((res: any) =>  res.dataValues)
+
+     const invocie_tables = await this.tablefoodInvoiceRepository.findAll(
+      {
+        raw: true,
+      
+        where: {
+      id_invoice: invoice.id
+     }})
 
      if(!invoice) throw new NotFoundException({ message: "Không tìm thấy yêu cầu hợp lệ", status: false });
 
-     return invoice
+    //  console.log(invoice.dataValues)
+   
+     console.log(invocie_tables)
+     console.log({
+      ...invoice,
+      tablefood_invoices: invocie_tables
+     })
+     return {
+      ...invoice,
+      tablefood_invoices: invocie_tables
+     }
       
   }
 
@@ -145,18 +167,20 @@ export class InvoiceService {
           model: Employee,
           attributes: { exclude: ["password"] },
         },
-        { model: Promotion },
+        { model: Promotion, 
+        },
         {
           model: Customer,
         },
-        {
-          model: TableFoodInvoice,
-        },
-        // {
-        //   model: InvoiceDetail,
-        //   include: [Product, Combo],
-        // },
-      ],
+       {
+        model: InvoiceDetail,
+        include: [Combo, Product]
+       },
+       {
+        model: TableFoodInvoice,
+       }
+       
+      ]
     });
     if (!invoice) throw new NotFoundException({ message: "not found invoice ", status: false });
     return invoice;
@@ -187,6 +211,8 @@ export class InvoiceService {
       });
       await this.tableInvoiceService.createMany(table_food_invoices);
       
+      await this.tableFoodRepository.update({status: 1}, {where : {id: infoCreate.id_tables}})
+      
     }
 
     invoice.price = price;
@@ -202,7 +228,7 @@ export class InvoiceService {
     if (infoEdit.lst_invoice_detail) {
       price = infoEdit.lst_invoice_detail.reduce((partialSum, item) => partialSum + item.price, 0);
       infoEdit.price = price;
-      await this.invoiceDetaiRepository.destroy({ where: { id_invoice: invoice.id } });
+      const id_tables =  await this.invoiceDetaiRepository.destroy({ where: { id_invoice: invoice.id } });
       await this.invoiceDetaiRepository.bulkCreate(infoEdit.lst_invoice_detail);
     }
 
@@ -211,14 +237,16 @@ export class InvoiceService {
       const table_food_invoices: TblInvoiceEdit[] = infoEdit.id_tables.map((item) => {
         return {
           id_table: item,
-          id_invoice: invoice.id,
+          id_invoice: id,
         };
       });
-
+     
+      console.log("check ", table_food_invoices)
       await this.tableInvoiceService.editMany(invoice.id, table_food_invoices);
+      await this.tableFoodRepository.update({status: 1}, {where : {id: infoEdit.id_tables}})
     }
-
-    return await invoice.update(infoEdit);
+    const data = await invoice.update(infoEdit)
+    return data;
   }
   async deleteById(id: number) {
     await this.invoiceDetaiRepository.destroy({ where: { id_invoice: id } });
