@@ -315,10 +315,10 @@ export class InvoiceService {
     oldInvoice.price = oldInvoice.price - invocie.price;
     await oldInvoice.save();
     ////////////////////////////////////////////////////////////////
-    return true;
+    return invocie;
   }
 
-  async combineInvocie(isCombineTable: boolean, combineInvocie: CombineInvoice) {
+  async combineInvocie( combineInvocie: CombineInvoice) {
     const old_invoice = await this.invoiceRepository.findByPk(combineInvocie.id_invoice_old, {
       attributes: { exclude: ["createdAt", "updatedAt"] },
       include: [InvoiceDetail],
@@ -353,8 +353,13 @@ export class InvoiceService {
         amount: item.amount,
       };
     });
-    if (isCombineTable) {
+    if (combineInvocie.isCombineTable) {
+      const tablefood_invoice = await this.tablefoodInvoiceRepository.findAll({where: {id_invoice: old_invoice.id}})
+       const id_tables = tablefood_invoice.map((item: any) => item.id_table)
+      
+      await this.tableFoodRepository.update({status: 0}, {where: {id: id_tables}})
       await this.tablefoodInvoiceRepository.destroy({ where: { id_invoice: old_invoice.id } });
+  
     } else {
       await this.tablefoodInvoiceRepository.update({ id_invoice: new_invoice.id }, { where: { id_invoice: old_invoice.id } });
     }
@@ -366,7 +371,7 @@ export class InvoiceService {
     new_invoice.price = price;
     await new_invoice.save();
 
-    return true;
+    return new_invoice;
   }
 
   async payment(invoice_id: number, paymentInfo: Payment) {
@@ -468,7 +473,7 @@ export class InvoiceService {
     const update_materials: any[] = Array.from(use_materials.values());
     update_materials.forEach(async (item: any) => {
       const material = await this.materialRepository.findByPk(item.id_material);
-      if (!material) throw new NotFoundException({ message: "not foun material", status: false });
+      if (!material) throw new NotFoundException({ message: "not found material", status: false });
       await material.update({ amount: material.amount - item.amount });
     });
     await invoice.update({ status: 1 });

@@ -87,12 +87,8 @@ export class InvoiceController {
   @ApiBearerAuth()
   @UseGuards(JwtAccessGuard)
   @Post("/combine-inovice")
-  async combineInvoice(@Query("isCombineTable") isCombineTable: boolean, @Body() combineInvoice: CombineInvoice) {
-    let check: boolean = false;
-    if (isCombineTable) {
-      check = isCombineTable;
-    }
-    return await this.invoiceService.combineInvocie(check, combineInvoice);
+  async combineInvoice(@Body() combineInvoice: CombineInvoice) {
+    return await this.invoiceService.combineInvocie(combineInvoice);
   }
 
   @ApiBearerAuth()

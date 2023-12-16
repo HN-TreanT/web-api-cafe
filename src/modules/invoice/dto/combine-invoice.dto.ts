@@ -5,4 +5,6 @@ export class CombineInvoice {
   id_invoice_new: number;
   @ApiProperty()
   id_invoice_old: number;
+  @ApiProperty({default: true})
+  isCombineTable: boolean
 }
