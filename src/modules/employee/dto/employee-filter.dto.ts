@@ -1,8 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class EmployeeFilter {
-  @ApiProperty()
+  
+  @ApiProperty({required:false})
   search: string;
-  @ApiProperty()
+  @ApiProperty({required:false})
   id_position: number;
 }

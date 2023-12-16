@@ -89,12 +89,7 @@ export class InvoiceService {
      if(!invoice) throw new NotFoundException({ message: "Không tìm thấy yêu cầu hợp lệ", status: false });
 
     //  console.log(invoice.dataValues)
-   
-     console.log(invocie_tables)
-     console.log({
-      ...invoice,
-      tablefood_invoices: invocie_tables
-     })
+
      return {
       ...invoice,
       tablefood_invoices: invocie_tables
@@ -241,7 +236,7 @@ export class InvoiceService {
         };
       });
      
-      console.log("check ", table_food_invoices)
+      console.log("check ", infoEdit.id_tables)
       await this.tableInvoiceService.editMany(invoice.id, table_food_invoices);
       await this.tableFoodRepository.update({status: 1}, {where : {id: infoEdit.id_tables}})
     }
