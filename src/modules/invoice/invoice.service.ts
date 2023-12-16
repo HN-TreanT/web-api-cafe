@@ -131,11 +131,11 @@ export class InvoiceService {
         },
         {
           model: TableFoodInvoice,
-          where: filter.id_table
-            ? {
-                id_table: filter.id_table,
-              }
-            : {},
+          // where: filter.id_table
+          //   ? {
+          //       id_table: filter.id_table,
+          //     }
+          //   : {},
             // required:false
         },
       ],
