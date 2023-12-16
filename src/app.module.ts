@@ -38,6 +38,7 @@ import { TransformInterceptor } from "./Interceptors/tranform.interceptor";
 import { DTCheckInventorModule } from "./modules/detail-check-inventory/detail-check-inventor.module";
 import { InvoiceDetailModule } from "./modules/invoice_detail/invoice-detail.module";
 import { PaginationMiddleware } from "./middleware/paginantion.middleware";
+import { EventGateway } from "./event.gateway";
 
 @Module({
   imports: [
@@ -89,6 +90,7 @@ import { PaginationMiddleware } from "./middleware/paginantion.middleware";
   ],
   controllers: [AppController],
   providers: [
+    EventGateway,
     AppService,
     {
       provide: APP_FILTER,

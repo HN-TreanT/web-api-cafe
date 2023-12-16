@@ -130,6 +130,10 @@ export class InvoiceService {
       
         },
         {
+          model: InvoiceDetail,
+          include: [Combo, Product]
+         },
+        {
           model: TableFoodInvoice,
           // where: filter.id_table
           //   ? {
