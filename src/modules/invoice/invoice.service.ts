@@ -574,8 +574,8 @@ export class InvoiceService {
         attributes: [
           [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'integer')), "totalPrice"], 
           [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("amount"), 'integer')), "totalAmout"],
-          [Sequelize.col("Product.name"), "nameProduct"] ,
-          [Sequelize.col("Combo.name"), "nameCombo"] 
+          // [Sequelize.col("Product.name"), "nameProduct"] ,
+          // [Sequelize.col("Combo.name"), "nameCombo"] 
         ],
         group: ["id_product", "id_combo"],
         order: [["totalPrice", "DESC"]],
