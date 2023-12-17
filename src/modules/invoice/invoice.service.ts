@@ -1,8 +1,10 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import {
+  CUSTOMER_REPOSITORY,
   INVOICE_DETAIL_REPOSITORY,
   INVOICE_REPOSITORY,
   MATERIAL_REPOSITORY,
+  SHIPMENT_REPOSITORY,
   TABLEFOOD_INVOICE_REPOSITORY,
   TABLEFOOD_REPOSITORY,
 } from "src/constants/repository_enum";
@@ -33,6 +35,8 @@ import { UseMaterial } from "../use_material/use_material.entity";
 import { DetailCombo } from "../detail_combo/detail_combo.entity";
 import { Material } from "../material/material.entity";
 import { raw } from "body-parser";
+import { Shipment } from "../shipment/shipment.entity";
+import {startOfDay, endOfDay, startOfWeek, endOfWeek , startOfMonth, endOfMonth, startOfYear, endOfYear} from "date-fns"
 
 @Injectable()
 export class InvoiceService {
@@ -42,6 +46,8 @@ export class InvoiceService {
     @Inject(TABLEFOOD_INVOICE_REPOSITORY) private readonly tablefoodInvoiceRepository: typeof TableFoodInvoice,
     @Inject(TABLEFOOD_REPOSITORY) private readonly tableFoodRepository: typeof TableFood,
     @Inject(MATERIAL_REPOSITORY) private readonly materialRepository: typeof Material,
+    @Inject(SHIPMENT_REPOSITORY) private readonly shipmentRepository: typeof Shipment,
+    @Inject(CUSTOMER_REPOSITORY) private readonly customerRepository: typeof Customer,
     private readonly tableInvoiceService: TablefoodInoviceService
   ) {}
 
@@ -482,5 +488,114 @@ export class InvoiceService {
     });
     await invoice.update({ status: 1 });
     return true;
+  }
+
+  async getOrverView(time: string) {
+    try {
+      let startTime: any;
+      let endTime: any;
+      let filter: any = {}
+      const currentDate = new Date();
+      if(time === "today") {
+         endTime = endOfDay(currentDate)
+         startTime = startOfDay(currentDate)
+      }
+      if(time === "thisweek") {
+        endTime = endOfWeek(currentDate)
+        startTime = startOfWeek(currentDate)
+     }
+     if(time === "thismonth") {
+      endTime = endOfMonth(currentDate)
+      startTime = startOfMonth(currentDate)
+      }
+      if(time === "thisyear") {
+        endTime = endOfYear(currentDate)
+        startTime = startOfYear(currentDate)
+    }
+      if(startTime && endTime) {
+          filter.createdAt = {[Op.between] : [startTime, endTime]}
+      }
+      let resp = await this.invoiceRepository.findOne({
+        attributes: [
+          [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("price"), 'float')), "productMoney"], 
+          [Sequelize.fn("COUNT", Sequelize.col("invoice.id")), "soHoaDon"]
+        ],
+        raw: true,
+        where:{
+          ...filter
+        }
+      });
+      let test: any = resp;
+      const coutInvoiceDetail = await this.invoiceDetaiRepository.count({
+        where:{
+          ...filter
+        }
+      })
+       const countCustomer = await this.customerRepository.count({
+          where:{
+            ...filter
+          }
+       })
+      const totalShipment = await this.shipmentRepository.sum("price", {
+        where:{
+          ...filter
+        }
+      })
+      const topProduct = await this.invoiceDetaiRepository.findAll({
+        where:{
+          ...filter
+        },
+        include: [Product, Combo],
+        attributes: [
+          [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'integer')), "totalPrice"], 
+          [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("amount"), 'integer')), "totalAmout"],
+          [Sequelize.col("Product.name"), "nameProduct"] ,
+          [Sequelize.col("Combo.name"), "nameCombo"] 
+        ],
+        group: ["id_product", "id_combo"],
+        order: [["totalPrice", "DESC"]],
+        limit:5
+       
+       })
+
+       const dataSend = {
+        totalShipment: totalShipment,
+        coutInvoiceDetail: coutInvoiceDetail,
+        topProduct: topProduct,
+        countCustomer: countCustomer,
+        doanhthu: test.productMoney ? test?.productMoney - totalShipment : 0 ,
+        ...resp
+       }   
+       return dataSend
+    } catch (err: any) {
+      console.log("check ", err)
+    }
+  }
+
+  async getRevenueOverview() {
+     const dataSend = []
+     const currentDate  = new Date()
+     for(let month = 0; month < 12; month ++){
+      const firstDayOfMonthCurentYear = new Date(currentDate.getFullYear(), month, 1);
+      const lastDayOfMonthCurentYear = new Date(currentDate.getFullYear(), month + 1, 0);
+      const firstDayOfMonthPreYear = new Date(currentDate.getFullYear() - 1 , month, 1);
+      const lastDayOfMonthPreYear = new Date(currentDate.getFullYear() -1 , month + 1, 0);
+       const uv = await this.invoiceRepository.sum("price", {
+        where : {
+          createdAt: {[Op.between] : [firstDayOfMonthCurentYear, lastDayOfMonthCurentYear]}
+        }
+       })
+       const pv = await this.invoiceRepository.sum("price", {
+        where : {
+          createdAt: {[Op.between] : [firstDayOfMonthPreYear, lastDayOfMonthPreYear]}
+        }
+       })
+      dataSend.push({
+          name :`Tháng ${month + 1}`,
+          uv: uv ? uv : 0,
+          pv: pv ? pv : 0
+      });
+     }
+     return dataSend
   }
 }

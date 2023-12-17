@@ -106,4 +106,21 @@ export class InvoiceController {
     const data = await this.invoiceService.completeInvocie(id);
     return data;
   }
+
+  @ApiBearerAuth()
+  // @UseGuards(JwtAccessGuard)
+  @Get("/over-view/get")
+  async getOverView(@Query("time") time: string) {
+    const data = await this.invoiceService.getOrverView(time);
+    return data;
+  }
+
+  @ApiBearerAuth()
+  // @UseGuards(JwtAccessGuard)
+  @Get("/over-view/revenue-overview")
+  async getRevenueOverview() {
+    const data = await this.invoiceService.getRevenueOverview();
+    return data;
+  }
+
 }

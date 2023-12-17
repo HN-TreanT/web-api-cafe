@@ -1,5 +1,7 @@
+import { Customer } from "../customer/customer.entity";
 import { InvoiceDetail } from "../invoice_detail/invoice_detail.entity";
 import { Material } from "../material/material.entity";
+import { Shipment } from "../shipment/shipment.entity";
 import { TableFood } from "../table_food/table_food.entity";
 import { TableFoodInvoice } from "../table_food_invoice/table_food_invoice.entity";
 import { Invoice } from "./invoice.entity";
@@ -9,6 +11,8 @@ import {
   MATERIAL_REPOSITORY,
   TABLEFOOD_INVOICE_REPOSITORY,
   TABLEFOOD_REPOSITORY,
+  SHIPMENT_REPOSITORY,
+  CUSTOMER_REPOSITORY
 } from "src/constants/repository_enum";
 
 export const invoiceProvider = [
@@ -17,5 +21,6 @@ export const invoiceProvider = [
   { provide: MATERIAL_REPOSITORY, useValue: Material },
   { provide: TABLEFOOD_INVOICE_REPOSITORY, useValue: TableFoodInvoice },
   { provide: TABLEFOOD_REPOSITORY, useValue: TableFood },
-  { provide: MATERIAL_REPOSITORY, useValue: Material },
+  { provide: SHIPMENT_REPOSITORY, useValue: Shipment },
+  { provide: CUSTOMER_REPOSITORY, useValue: Customer },
 ];
