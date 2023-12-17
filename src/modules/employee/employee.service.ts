@@ -80,7 +80,7 @@ export class EmployeeService {
     return employee;
   }
   async create(employeeCreate: EmployeeCreate): Promise<Employee> {
-   try {
+   
     if(employeeCreate.password) {
       const hashPassword = await bcrypt.hash(employeeCreate.password, 10);
       employeeCreate.password = hashPassword
@@ -97,9 +97,7 @@ export class EmployeeService {
         await this.employeeWorkshiftService.createMany(temp)
     }
     return employee
-   } catch (err) {
-    console.log(err)
-   }
+  
   }
   async update(id: number, employeeUpdate: EmployeeUpdate): Promise<Employee> {
     const employee = await this.employeeRepository.findByPk(id);
