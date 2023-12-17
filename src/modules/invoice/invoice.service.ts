@@ -491,7 +491,7 @@ export class InvoiceService {
   }
 
   async getOrverView(time: string) {
-    try {
+    // try {
       let startTime: any;
       let endTime: any;
       let filter: any = {}
@@ -567,9 +567,9 @@ export class InvoiceService {
         ...resp
        }   
        return dataSend
-    } catch (err: any) {
-      console.log("check ", err)
-    }
+    // } catch (err: any) {
+    //   console.log("check ", err)
+    // }
   }
 
   async getRevenueOverview() {
