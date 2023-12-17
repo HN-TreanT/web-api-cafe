@@ -518,7 +518,7 @@ export class InvoiceService {
       let resp = await this.invoiceRepository.findOne({
         attributes: [
           [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("price"), 'float')), "productMoney"], 
-          [Sequelize.fn("COUNT", Sequelize.col("invoice.id")), "soHoaDon"]
+          [Sequelize.fn("COUNT", Sequelize.col("Invoice.id")), "soHoaDon"]
         ],
         raw: true,
         where:{
