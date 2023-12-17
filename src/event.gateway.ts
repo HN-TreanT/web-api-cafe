@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { AuthService } from "./modules/auth/auth.service";
+import { InvoiceService } from "./modules/invoice/invoice.service";
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsResponse } from "@nestjs/websockets";
 import { UseGuards } from "@nestjs/common";
 import { JwtAccessGuard } from "./guards/jwt-access.guard";
@@ -12,7 +12,7 @@ import { Observable, from, map } from "rxjs";
 export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
-    // constructor(private readonly autheService: AuthService) {}
+     constructor(private readonly invoiceServices: InvoiceService) {}
   afterInit(server: any) {}
   @UseGuards(JwtAccessGuard)
   async handleConnection(socket: Socket) {
@@ -38,8 +38,29 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
   // ban socket theo point
   
   @SubscribeMessage("announce")
-  async handleMessage(@MessageBody() data: any): Promise<Observable<WsResponse<number>>> {
-    return from([1, 2, 3]).pipe(map(item => ({ event: 'announce', data: data })));
+  async handleMessage(@MessageBody() data: any): Promise<any> {
+    
+    try {
+      const res = await this.invoiceServices.completeInvocie(data?.id_invoice)
+      if(res) {
+        this.server.emit("announce_success", {
+          id_invoice: data.id_invoice,
+          message:"success"
+        })
+      } else {
+        this.server.emit("announce_success", {
+          id_invoice: data.id_invoice,
+          message:"error"
+        })
+      }
+    
+    } catch (err: any) {
+      console.log(err)
+      this.server.emit("announce_success", {
+        id_invoice: data.id_invoice,
+        message:"error"
+      })
+    }
   
   }
 }
