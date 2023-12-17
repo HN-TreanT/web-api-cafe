@@ -13,10 +13,8 @@ export class TableFoodService {
   ) {}
 
   async get(pagination: any, filter: any): Promise<PagedData<TableFood>> {
-    console.log(filter);
     const { count, rows } = await this.tableFoodRepository.findAndCountAll({
       where: { ...filter },
-      order: [["name", "ASC"]],
       ...pagination,
     });
 
