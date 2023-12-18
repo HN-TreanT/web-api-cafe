@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { EMPLOYEE_REPOSITORY } from "src/constants/repository_enum";
 import { Employee } from "../employee/employee.entity";
 import * as bcrypt from "bcrypt";
@@ -27,6 +27,8 @@ export class AuthService {
   }
 
   async register(registerInfo: RegisterInfo): Promise<Employee> {
+   try {
+
     const hashPassword = await bcrypt.hash(registerInfo.password, 10);
     registerInfo.password = hashPassword;
     if (!registerInfo.id_position) {
@@ -35,6 +37,10 @@ export class AuthService {
     }
     const user = await this.authRepository.create(registerInfo);
     return user;
+   } catch (err: any) {
+    console.log(err)
+    throw new BadRequestException(err)
+   }
   }
 
   async signIn(user: Employee): Promise<any> {

@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { EMPLOYEE_REPOSITORY, EMPLOYEE_WORKSHIFT_REPOSITORY } from "src/constants/repository_enum";
 import { Employee } from "./employee.entity";
 import EmployeeUpdate from "./dto/employee-update.dto";
@@ -80,23 +80,30 @@ export class EmployeeService {
     return employee;
   }
   async create(employeeCreate: EmployeeCreate): Promise<Employee> {
-   
-    if(employeeCreate.password) {
-      const hashPassword = await bcrypt.hash(employeeCreate.password, 10);
-      employeeCreate.password = hashPassword
-    }
-    const employee = await this.employeeRepository.create(employeeCreate)
     
-    if (employeeCreate.employee_worshift) {
-      const temp = employeeCreate.employee_worshift.map((item) => {
-         return {
-          id_employee: employee.id,
-          id_workshift: item
-         }
-      })
-        await this.employeeWorkshiftService.createMany(temp)
-    }
-    return employee
+   try {
+      
+        if(employeeCreate.password) {
+          const hashPassword = await bcrypt.hash(employeeCreate.password, 10);
+          employeeCreate.password = hashPassword
+        }
+        const employee = await this.employeeRepository.create(employeeCreate)
+        if (employeeCreate.employee_worshift) {
+          const temp = employeeCreate.employee_worshift.map((item) => {
+            return {
+              id_employee: employee.id,
+              id_workshift: item
+            }
+          })
+            await this.employeeWorkshiftService.createMany(temp)
+        }
+        return employee
+   
+
+   } catch (err: any) {
+      console.log(err)
+       throw new  BadRequestException(err)
+   }
   
   }
   async update(id: number, employeeUpdate: EmployeeUpdate): Promise<Employee> {
