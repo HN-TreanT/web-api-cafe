@@ -9,8 +9,8 @@ export class FilterDto {
   id_promotion: string;
   @ApiProperty({required:false})
   name_customer: string;
-  @ApiProperty({required:false})
-  status: number;
+  @ApiProperty({required:false, type: [Number]})
+  status: number[];
   @ApiProperty({required:false})
   phone_number: string;
   @ApiProperty({required:false})

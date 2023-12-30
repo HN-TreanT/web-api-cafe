@@ -63,4 +63,13 @@ export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     }
   
   }
+
+  @SubscribeMessage("change_order")
+  async handleChangeOrder(@MessageBody() data: any) : Promise<any> {
+ 
+    if(data?.status) this.server.emit("change_order_success", {
+      status: true,
+      table: data?.table ? data?.table : ""
+    })
+  }
 }

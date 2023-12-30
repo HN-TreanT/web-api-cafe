@@ -57,10 +57,12 @@ export class InvoiceService {
       where: {
         time_pay: null
       },
+      
       include: [
         {
           model: Employee,
           attributes: { exclude: ["password"] },
+        
         },
         { model: Promotion, 
         },
@@ -77,19 +79,17 @@ export class InvoiceService {
           id_table: id_table,
           
         },
-        // required:false
-       },
-      
-       
+        
+       },    
       ]
-     }).then((res: any) =>  res.dataValues)
+     })
+     
 
      const invocie_tables = await this.tablefoodInvoiceRepository.findAll(
       {
-        raw: true,
-      
+     
         where: {
-      id_invoice: invoice.id
+      id_invoice: invoice.dataValues.id
      }})
 
      if(!invoice) throw new NotFoundException({ message: "Không tìm thấy yêu cầu hợp lệ", status: false });
@@ -97,7 +97,7 @@ export class InvoiceService {
     //  console.log(invoice.dataValues)
 
      return {
-      ...invoice,
+      ...invoice.dataValues,
       tablefood_invoices: invocie_tables
      }
       
@@ -110,9 +110,14 @@ export class InvoiceService {
     if (filter.id_customer) filterInvoice.id_customer = filter.id_customer;
     if (filter.id_employee) filterInvoice.id_employee = filter.id_employee;
     if (filter.id_promotion) filterInvoice.id_promotion = filter.id_promotion;
-    if (filter.status) filterInvoice.status = filter.status;
-     if(filter?.thanh_toan === "chua") filterInvoice.time_pay = null; 
-    if (filter.time_start && filter.time_end) filterInvoice.createdAt = { [Op.between]: [filter.time_start, filter.time_end] };
+    // if (filter.status) filterInvoice.status = filter.status;
+    if (filter.status) filterInvoice.status = {[Op.in] : [...filter?.status]};
+     if(filter?.thanh_toan) filterInvoice.time_pay = filter.thanh_toan === "chua" ? null : {[Op.ne] : null};  // chua va thanhtoan
+    if (filter.time_start && filter.time_end) {
+                    
+      filterInvoice.createdAt = { [Op.between]: [filter.time_start, filter.time_end] }
+    
+    };
 
 
     if (order.createdAt) orderInvoice = [...orderInvoice, ["createdAt", `${order.createdAt}`]];
@@ -141,12 +146,6 @@ export class InvoiceService {
          },
         {
           model: TableFoodInvoice,
-          // where: filter.id_table
-          //   ? {
-          //       id_table: filter.id_table,
-          //     }
-          //   : {},
-            // required:false
         },
       ],
     });
@@ -246,7 +245,6 @@ export class InvoiceService {
         };
       });
      
-      console.log("check ", infoEdit.id_tables)
       await this.tableInvoiceService.editMany(invoice.id, table_food_invoices);
       await this.tableFoodRepository.update({status: 1}, {where : {id: infoEdit.id_tables}})
     }
