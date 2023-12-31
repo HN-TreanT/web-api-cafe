@@ -4,6 +4,7 @@ import {
   INVOICE_DETAIL_REPOSITORY,
   INVOICE_REPOSITORY,
   MATERIAL_REPOSITORY,
+  PRODUCT_REPOSITORY,
   SHIPMENT_REPOSITORY,
   TABLEFOOD_INVOICE_REPOSITORY,
   TABLEFOOD_REPOSITORY,
@@ -37,7 +38,12 @@ import { Material } from "../material/material.entity";
 import { raw } from "body-parser";
 import { Shipment } from "../shipment/shipment.entity";
 import {startOfDay, endOfDay, startOfWeek, endOfWeek , startOfMonth, endOfMonth, startOfYear, endOfYear} from "date-fns"
-
+import XlsxTemplate from "xlsx-template";
+import {join} from 'path'
+import {readFile, readFileSync} from 'fs'
+import { Cell,Row } from "exceljs";
+import ExcelJS from "exceljs"
+import { VND } from "src/helpers/convertVND";
 @Injectable()
 export class InvoiceService {
   constructor(
@@ -48,6 +54,8 @@ export class InvoiceService {
     @Inject(MATERIAL_REPOSITORY) private readonly materialRepository: typeof Material,
     @Inject(SHIPMENT_REPOSITORY) private readonly shipmentRepository: typeof Shipment,
     @Inject(CUSTOMER_REPOSITORY) private readonly customerRepository: typeof Customer,
+    @Inject(PRODUCT_REPOSITORY) private readonly productRepositorty: typeof Product,
+
     private readonly tableInvoiceService: TablefoodInoviceService
   ) {}
 
@@ -621,4 +629,291 @@ export class InvoiceService {
      }
      return dataSend
   }
+
+  // async exportFileReport() {
+  //   const path = join(__dirname,'..','..','src/templates/excel/TEST2.xlsx')
+  //   const data = await readFileSync(path)
+  //   const options = {imageRatio : 75.4}
+  //   var template = new XlsxTemplate(data, options)
+  //   const fakeData = {
+  //       tensanpham:["Nam","HUNG","CUONG","PHUC"],
+  //       title:[ { uoctinh: "ƯỚC TÍNH",thucte:"THỰC TẾ" }, {uoctinh: "ƯỚC TÍNH",thucte:"THỰC TẾ"},{uoctinh: "ƯỚC TÍNH",thucte:"THỰC TẾ" },{uoctinh: "ƯỚC TÍNH",thucte:"THỰC TẾ"}],
+  //       priceQ1:[{ uoctinh: "10",thucte:"20" },{uoctinh: "10",thucte:"30"},{uoctinh: "20", thucte:"10"},{uoctinh: "40",thucte:"50"}],
+  //       priceQ2:[{ uoctinh: "10",thucte:"20" },{uoctinh: "10",thucte:"30"},{uoctinh: "20", thucte:"10"},{uoctinh: "40",thucte:"50"}],
+  //       priceQ3:[{ uoctinh: "10",thucte:"20" },{uoctinh: "10",thucte:"30"},{uoctinh: "20", thucte:"10"},{uoctinh: "40",thucte:"50"}],
+  //       priceQ4:[{ uoctinh: "10",thucte:"20" },{uoctinh: "10",thucte:"30"},{uoctinh: "20", thucte:"10"},{uoctinh: "40",thucte:"50"}],   
+  //   }
+
+   
+  //   var sheetNumber = 1
+  //   template.substitute(sheetNumber, fakeData)
+  //   const file = template.generate()
+    
+  //   return template
+  // }
+
+   stylCellHeader(cell: Cell) {
+     cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+     cell.font = {size: 14, family: 1, bold:true, color: { argb: 'ffffff' }};
+     cell.fill =  {
+      type: 'pattern',
+      pattern:'solid',
+      fgColor: { argb: 'B18904' }
+     },
+     cell.border= {
+      top: { style: 'medium',  color: { argb: 'cccccc' }  },
+      left: { style: 'medium',  color: { argb: 'cccccc' }  },
+      bottom: { style: 'medium',  color: { argb: 'cccccc' }  },
+      right: { style: 'medium', color: { argb: 'cccccc' }  },
+      
+     }
+     
+   }
+
+   styleCellNameProduct(cell: Cell) {
+    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+    cell.font = {size: 14, family: 1, bold:true, color: { argb: 'ffffff' }};
+    cell.fill =  {
+      type: 'pattern',
+      pattern:'solid',
+      fgColor:{ argb:'886A08' }
+     },
+     cell.border= {
+      top: { style: 'medium',  color: { argb: 'cccccc' }  },
+      left: { style: 'medium',  color: { argb: 'cccccc' }  },
+      bottom: { style: 'medium',  color: { argb: 'cccccc' }  },
+      right: { style: 'medium', color: { argb: 'cccccc' }  },
+      
+     }
+   }
+
+   styleUocATinhThucTe(cell:Cell) {
+      cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+      cell.font = {size: 12, family: 1, bold:true, color: { argb: 'ffffff' }};
+      cell.fill =  {
+        type: 'pattern',
+        pattern:'solid',
+        fgColor:{ argb:'A4A4A4' }
+      },
+      cell.border= {
+        top: { style: 'medium',  color: { argb: 'cccccc' }  },
+        left: { style: 'medium',  color: { argb: 'cccccc' }  },
+        bottom: { style: 'medium',  color: { argb: 'cccccc' }  },
+        right: { style: 'medium', color: { argb: 'cccccc' }  },
+        
+      }
+   }
+
+   styleListSidebarYear (cell: Cell) {
+    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+    cell.font = {size: 10, family: 1, bold:true};
+    cell.fill =  {
+      type: 'pattern',
+      pattern:'solid',
+      fgColor:{ argb:'D8D8D8' }
+    },
+    cell.border= {
+      top: { style: 'medium',  color: { argb: 'cccccc' },   },
+      left: { style: 'medium',  color: { argb: 'cccccc' }  },
+      bottom: { style: 'medium',  color: { argb: 'cccccc' }  },
+      right: { style: 'medium', color: { argb: 'cccccc' }  },
+      
+    }
+   }
+
+   styleValue (cell: Cell) {
+    cell.alignment = {  wrapText: true, vertical: 'middle', horizontal: 'right', };
+    cell.font = {size: 10, family: 1, bold:true};
+    cell.fill =  {
+      type: 'pattern',
+      pattern:'solid',
+      // fgColor:{ argb:'ffff' }
+    },
+    cell.border= {
+      top: { style: 'medium',  color: { argb: 'cccccc' }  },
+      left: { style: 'medium',  color: { argb: 'cccccc' }  },
+      bottom: { style: 'medium',  color: { argb: 'cccccc' }  },
+      right: { style: 'medium', color: { argb: 'cccccc' }  },
+      
+    }
+   }
+
+    async exportFileReport(res:any) : Promise<any> {
+      const path = join(__dirname,'..','..','src/templates/excel/TEST2.xlsx')
+      const templatefile = await readFileSync(path)   
+      const workbook = new ExcelJS.Workbook();
+      const nowDate = new Date()
+      const currentYear = nowDate.getFullYear()
+      
+      await workbook.xlsx.load(templatefile)
+
+      const countProduct = await this.productRepositorty.count()
+      const worksheet = workbook.getWorksheet("BaoCaoDoanhThu")
+
+      const fakeData = [ 
+        {
+          tensanpham:"San pham 1",
+          current_q1: {uoctinh: 10, thucte:20},
+          current_q2: {uoctinh: 43, thucte:98},
+          current_q3: {uoctinh: 12, thucte:124},
+          current_q4: {uoctinh: 16, thucte:33},
+          pre_q1: {uoctinh: 16, thucte:33},
+          pre_q2: {uoctinh: 16, thucte:33},
+          pre_q3: {uoctinh: 16, thucte:33},
+          pre_q4: {uoctinh: 16, thucte:33},
+          total: {uoctinh: 101, thucte: 102}
+        },
+        {
+          tensanpham:"San pham 2",
+          current_q1: {uoctinh: 10, thucte:20},
+          current_q2: {uoctinh: 43, thucte:98},
+          current_q3: {uoctinh: 12, thucte:124},
+          current_q4: {uoctinh: 16, thucte:33},
+          pre_q1: {uoctinh: 16, thucte:33},
+          pre_q2: {uoctinh: 16, thucte:33},
+          pre_q3: {uoctinh: 16, thucte:33},
+          pre_q4: {uoctinh: 16, thucte:33},
+          total: {uoctinh: 101, thucte: 102}
+
+
+        },
+        {
+          tensanpham:"San pham 3",
+          current_q1: {uoctinh: 10, thucte:20},
+          current_q2: {uoctinh: 43, thucte:98},
+          current_q3: {uoctinh: 12, thucte:124},
+          current_q4: {uoctinh: 16, thucte:33},
+          pre_q1: {uoctinh: 16, thucte:33},
+          pre_q2: {uoctinh: 16, thucte:33},
+          pre_q3: {uoctinh: 16, thucte:33},
+          pre_q4: {uoctinh: 16, thucte:33},
+          total: {uoctinh: 101, thucte: 102}
+
+
+        },
+        {
+          tensanpham:"San pham 4",
+          current_q1: {uoctinh: 10, thucte:20},
+          current_q2: {uoctinh: 43, thucte:98},
+          current_q3: {uoctinh: 12, thucte:124},
+          current_q4: {uoctinh: 16, thucte:33},
+          pre_q1: {uoctinh: 16, thucte:33},
+          pre_q2: {uoctinh: 16, thucte:33},
+          pre_q3: {uoctinh: 16, thucte:33},
+          pre_q4: {uoctinh: 16, thucte:33},
+          total: {uoctinh: 101, thucte: 102}
+
+
+        }
+       ]
+
+       const years = [`${currentYear} Q1`, `${currentYear} Q2`, `${currentYear} Q3`, `${currentYear} Q4`, 
+                         `${currentYear - 1} Q1`, `${currentYear - 1} Q2`, `${currentYear - 1} Q3`, `${currentYear - 1} Q4`, `Tổng`]
+
+      ///tieu de
+      const rowHeader = worksheet.getRow(5)
+      const cellHeader = rowHeader.getCell(3)
+      cellHeader.value = "SẢN PHẨM"
+      worksheet.mergeCells(
+        Number(cellHeader.row),
+        Number(cellHeader.col),
+        Number(cellHeader.row),
+        Number(cellHeader.col + countProduct*2) - 1 ,
+        // "BaoCaoDoanhThu"
+      )
+      this.stylCellHeader(cellHeader)
+      /////////
+
+      /// content
+      let startCol = 3
+      fakeData.forEach((item: any) => {
+         
+          // set witdh for columns
+          const columns = [
+            { key:"uoctinh", header:""},
+            { key:"thucte", header:""},
+          ] 
+          worksheet.getColumn(startCol).width = 15
+          worksheet.getColumn(startCol + 1).width = 15      
+          ////
+          ///ten san pham
+          const rowNameProduct = worksheet.getRow(6)
+          const colNameProduct = rowNameProduct.getCell(startCol)
+         
+          worksheet.mergeCells(
+            Number(colNameProduct.row),
+            Number(colNameProduct.col),
+            Number(colNameProduct.row),
+            Number(colNameProduct.col) + 1 ,
+            // "BaoCaoDoanhThu"
+          )
+          colNameProduct.value = item.tensanpham
+          this.styleCellNameProduct(colNameProduct)
+          ///////
+          ///uoc tinh, thuc te
+          const rowUocTinh = worksheet.getRow(7)
+          const colUocTinh = rowUocTinh.getCell(startCol)
+          const colThucTe = rowUocTinh.getCell(startCol + 1)
+           colUocTinh.value = "ƯỚC TÍNH"
+           colThucTe.value = "THỰC TẾ"
+           this.styleUocATinhThucTe(colUocTinh)
+           this.styleUocATinhThucTe(colThucTe)
+          //////// lít year
+          let startColYear = 8
+          years.forEach((item1) => {
+            let index = 1
+              /// sidebar 
+              const rowYear = worksheet.getRow(startColYear)
+              const colYear = rowYear.getCell(2)
+              colYear.value = item1
+              this.styleListSidebarYear(colYear)
+
+              ///value
+              const colValueUocTinh = rowYear.getCell(startCol)
+              const colValueThucTe = rowYear.getCell(startCol + 1)
+              if(index <= 4) {
+                
+                colValueUocTinh.value = VND.format(item[`current_q${index}`].uoctinh)
+                colValueThucTe.value = VND.format(item[`current_q${index}`].thucte)
+              } else if (index > 8) {
+             
+                colValueUocTinh.value = VND.format(item[`total`].uoctinh)
+                colValueThucTe.value = VND.format(item[`total`].thucte)
+              } else {
+              
+                colValueUocTinh.value = VND.format(item[`pre_q${index - 4}`].uoctinh)
+                colValueThucTe.value = VND.format(item[`pre_q${index - 4}`].thucte)
+              }
+              this.styleValue(colValueUocTinh)
+              this.styleValue(colValueThucTe)
+              colValueThucTe.fill =  {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{ argb:'F6E3CE' }
+              },
+
+              ///
+              index + 1
+              startColYear += 1
+          })
+          /////
+         
+           startCol += 2;
+      })
+
+
+
+
+
+      /////////
+
+      /// gui file
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename=${`BaoCaoDoanhThu1.xlsx`}`);
+      await workbook.xlsx.write(res)
+      res.send()
+      return path
+  }
+
+
 }

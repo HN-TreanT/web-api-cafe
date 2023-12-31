@@ -1,5 +1,5 @@
 import { InvoiceService } from "./invoice.service";
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { InvoiceCreate } from "./dto/invoice-create.dto";
 import { InoviceEdit } from "./dto/invoice-edit.dto";
 import { PaginationGuard } from "src/guards/pagination.guard";
@@ -15,7 +15,9 @@ import { ROLES } from "src/constants/role.enum";
 import { RolesGuard } from "src/guards/role.guard";
 import { Roles } from "src/decorator/role.decorator";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-
+import { createReadStream, readFileSync } from "fs";
+import { join } from "path";
+import { Response } from "express";
 @ApiTags("invoice")
 @Controller("invoice")
 export class InvoiceController {
@@ -121,6 +123,26 @@ export class InvoiceController {
   async getRevenueOverview() {
     const data = await this.invoiceService.getRevenueOverview();
     return data;
+  }
+
+  @ApiBearerAuth()
+  @Get("/file/report")
+  async exportReport(@Res() res: Response) {
+   const data = await this.invoiceService.exportFileReport(res)
+   
+  //  res.end(data, 'binary')
+    // const buffer = await workbook.generate({type:"nodebuffer"})
+    // res.setHeader(
+    //   "Content-Type",
+    //   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    // );
+    // res.setHeader(
+    //   "Content-Disposition",
+    //   "attachment; filename=" + "BaoCaoDoanhThu1.xlsx"
+    // );
+
+    // res.end(buffer, 'binary')
+    // res.download(file)
   }
 
 }
