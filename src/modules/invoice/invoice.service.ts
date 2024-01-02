@@ -1056,7 +1056,7 @@ export class InvoiceService {
       })
 
     
-      // const priceUocTinh
+      // const priceUocTinh/// 
 
       colStartFooterValueThucTe.value = VND.format(priceThucte)
       colStartFooterValueUocTinh.value = VND.format(priceUocTinh)
