@@ -61,6 +61,7 @@
     "sequelize-typescript": "^2.1.5",
     "typeorm": "^0.3.17",
     "xlsx": "^0.18.5",
+    "xlsx-chart": "^0.4.3",
     "xlsx-template": "^1.4.3"
   },
   "devDependencies": {

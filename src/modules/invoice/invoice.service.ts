@@ -31,20 +31,20 @@ import { TblInvoiceEdit } from "../table_food_invoice/dto/tbl-inovice-edit.dto";
 import { Product } from "../product/product.entity";
 import { Combo } from "../combo/combo.entity";
 import { Payment } from "./dto/payment.dto";
-import { format } from "date-fns";
 import { UseMaterial } from "../use_material/use_material.entity";
 import { DetailCombo } from "../detail_combo/detail_combo.entity";
 import { Material } from "../material/material.entity";
-import { raw } from "body-parser";
 import { Shipment } from "../shipment/shipment.entity";
 import {startOfDay, endOfDay, startOfWeek, endOfWeek , startOfMonth, endOfMonth, startOfYear, endOfYear} from "date-fns"
-import XlsxTemplate from "xlsx-template";
 import {join} from 'path'
-import {readFile, readFileSync} from 'fs'
+import {readFile, readFileSync, writeFileSync} from 'fs'
 import { Cell,Row } from "exceljs";
 import ExcelJS from "exceljs"
 import { VND } from "src/helpers/convertVND";
 import moment from "moment";
+// import * as XLSXChart  from "xlsx-chart"
+const XLSXChart: any = require("xlsx-chart")
+const xlsxChart = new XLSXChart()
 @Injectable()
 export class InvoiceService {
   constructor(
@@ -781,8 +781,8 @@ export class InvoiceService {
         
         },
       },
-      include: [{model:Product}, {model: Combo}], 
-      attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+      include: [{model:Product, as:"product"}, {model: Combo, as:"combo"}], 
+      attributes:[[Sequelize.col("product.id"), "id_product"],[Sequelize.col("combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
       group: ["id_product", "id_combo"], 
       })
 
@@ -795,8 +795,8 @@ export class InvoiceService {
         
         },
       },
-      include: [{model:Product}, {model: Combo}], 
-      attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+      include: [{model:Product, as:"product"}, {model: Combo, as:"combo"}], 
+      attributes:[[Sequelize.col("product.id"), "id_product"],[Sequelize.col("combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
       group: ["id_product", "id_combo"], 
       })
 
@@ -809,8 +809,8 @@ export class InvoiceService {
         
         },
       },
-      include: [{model:Product}, {model: Combo}], 
-      attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+      include: [{model:Product, as:"product"}, {model: Combo, as:"combo"}], 
+      attributes:[[Sequelize.col("product.id"), "id_product"],[Sequelize.col("combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
       group: ["id_product", "id_combo"], 
       })
 
@@ -823,10 +823,13 @@ export class InvoiceService {
         
         },
       },
-      include: [{model:Product}, {model: Combo}], 
-      attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+      include: [{model:Product,as:"product"}, {model: Combo, as:"combo"}], 
+      attributes:[[Sequelize.col("product.id"), "id_product"],[Sequelize.col("combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
       group: ["id_product", "id_combo"], 
       })
+
+
+     
 
       
 
@@ -842,8 +845,8 @@ export class InvoiceService {
         
         },
       },
-        include: [{model:Product}, {model: Combo}], 
-        attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+        include: [{model:Product, as:"product"}, {model: Combo, as:"combo"}], 
+        attributes:[[Sequelize.col("product.id"), "id_product"],[Sequelize.col("combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
         group: ["id_product", "id_combo"], 
       })
 
@@ -856,8 +859,8 @@ export class InvoiceService {
         
         },
       },
-      include: [{model:Product}, {model: Combo}], 
-      attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+      include: [{model:Product, as:"product"}, {model: Combo, as:"combo"}], 
+      attributes:[[Sequelize.col("product.id"), "id_product"],[Sequelize.col("combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
       group: ["id_product", "id_combo"], 
       })
 
@@ -870,8 +873,8 @@ export class InvoiceService {
         
         },
       },
-        include: [{model:Product}, {model: Combo}], 
-        attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+        include: [{model:Product, as:"product"}, {model: Combo, as:"combo"}], 
+        attributes:[[Sequelize.col("product.id"), "id_product"],[Sequelize.col("combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
         group: ["id_product", "id_combo"], 
       })
 
@@ -883,8 +886,8 @@ export class InvoiceService {
             [Op.lt]: moment(`${curretYear - 1}-12-31 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
           },
         },       
-         include: [{model:Product}, {model: Combo}], 
-         attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+         include: [{model:Product, as:"product"}, {model: Combo, as:"combo"}], 
+         attributes:[[Sequelize.col("product.id"), "id_product"],[Sequelize.col("combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
          group: ["id_product", "id_combo"], 
   
           
@@ -910,77 +913,67 @@ export class InvoiceService {
       //  return listDataQ1
    }
 
+   async insertCharts(data: any, pathExample: any) {
+       var opts = {
+        // file:"chart.xlsx",
+        file:join(__dirname,'..','..','src/templates/excel/chart.xlsx'),
+        chart: "column",
+          titles: [
+            "Title 1",
+            "Title 2",
+            "Title 3"
+          ],
+          fields: [
+            "Field 1",
+            "Field 2",
+            "Field 3",
+            "Field 4"
+          ],
+          data: {
+            "Title 1": {
+              "Field 1": 5,
+              "Field 2": 10,
+              "Field 3": 15,
+              "Field 4": 20 
+            },
+            "Title 2": {
+              "Field 1": 10,
+              "Field 2": 5,
+              "Field 3": 20,
+              "Field 4": 15
+            },
+            "Title 3": {
+              "Field 1": 20,
+              "Field 2": 15,
+              "Field 3": 10,
+              "Field 4": 5
+            }
+          }
+       }
+       xlsxChart.writeFile (opts, function (err: any) {
+        console.log ("File: ", opts.file);
+      });
+   }
+
     async exportFileReport(res:any) : Promise<any> {
       const path = join(__dirname,'..','..','src/templates/excel/TEST2.xlsx')
       const templatefile = await readFileSync(path)   
+    
       const workbook = new ExcelJS.Workbook();
       const nowDate = new Date()
       const currentYear = nowDate.getFullYear()
       const dataReport =await this.getDataReport(currentYear)
-      
+      await this.insertCharts([], path)
+      //doc file chart
+    
+      const chartFile = await readFileSync(join(__dirname,'..','..','src/templates/excel/chart.xlsx'))
+
+  
       await workbook.xlsx.load(templatefile)
 
       // const countProduct = await this.productRepositorty.count()
       
       const worksheet = workbook.getWorksheet("BaoCaoDoanhThu")
-
-      // const fakeData = [ 
-      //   {
-      //     tensanpham:"San pham 1",
-      //     current_q1: {uoctinh: 10, thucte:20},
-      //     current_q2: {uoctinh: 43, thucte:98},
-      //     current_q3: {uoctinh: 12, thucte:124},
-      //     current_q4: {uoctinh: 16, thucte:33},
-      //     pre_q1: {uoctinh: 16, thucte:33},
-      //     pre_q2: {uoctinh: 16, thucte:33},
-      //     pre_q3: {uoctinh: 16, thucte:33},
-      //     pre_q4: {uoctinh: 16, thucte:33},
-      //     total: {uoctinh: 101, thucte: 102}
-      //   },
-      //   {
-      //     tensanpham:"San pham 2",
-      //     current_q1: {uoctinh: 10, thucte:20},
-      //     current_q2: {uoctinh: 43, thucte:98},
-      //     current_q3: {uoctinh: 12, thucte:124},
-      //     current_q4: {uoctinh: 16, thucte:33},
-      //     pre_q1: {uoctinh: 16, thucte:33},
-      //     pre_q2: {uoctinh: 16, thucte:33},
-      //     pre_q3: {uoctinh: 16, thucte:33},
-      //     pre_q4: {uoctinh: 16, thucte:33},
-      //     total: {uoctinh: 101, thucte: 102}
-
-
-      //   },
-      //   {
-      //     tensanpham:"San pham 3",
-      //     current_q1: {uoctinh: 10, thucte:20},
-      //     current_q2: {uoctinh: 43, thucte:98},
-      //     current_q3: {uoctinh: 12, thucte:124},
-      //     current_q4: {uoctinh: 16, thucte:33},
-      //     pre_q1: {uoctinh: 16, thucte:33},
-      //     pre_q2: {uoctinh: 16, thucte:33},
-      //     pre_q3: {uoctinh: 16, thucte:33},
-      //     pre_q4: {uoctinh: 16, thucte:33},
-      //     total: {uoctinh: 101, thucte: 102}
-
-
-      //   },
-      //   {
-      //     tensanpham:"San pham 4",
-      //     current_q1: {uoctinh: 10, thucte:20},
-      //     current_q2: {uoctinh: 43, thucte:98},
-      //     current_q3: {uoctinh: 12, thucte:124},
-      //     current_q4: {uoctinh: 16, thucte:33},
-      //     pre_q1: {uoctinh: 16, thucte:33},
-      //     pre_q2: {uoctinh: 16, thucte:33},
-      //     pre_q3: {uoctinh: 16, thucte:33},
-      //     pre_q4: {uoctinh: 16, thucte:33},
-      //     total: {uoctinh: 101, thucte: 102}
-
-
-      //   }
-      //  ]
-
        const years = [`${currentYear} Q1`, `${currentYear} Q2`, `${currentYear} Q3`, `${currentYear} Q4`, 
                          `${currentYear - 1} Q1`, `${currentYear - 1} Q2`, `${currentYear - 1} Q3`, `${currentYear - 1} Q4`, `Tổng`]
 

@@ -129,8 +129,7 @@ export class InvoiceController {
   @Get("/file/report")
   async exportReport(@Res() res: Response) {
    const data = await this.invoiceService.exportFileReport(res)
-  //  return {oke: "fjegfjegbf"}
-  //  res.send({data:data})
+  //  await this.invoiceService.insertCharts(res)
   }
 
 }
