@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import {
   CUSTOMER_REPOSITORY,
   INVOICE_DETAIL_REPOSITORY,
@@ -42,7 +42,7 @@ import { Cell,Row } from "exceljs";
 import ExcelJS from "exceljs"
 import { VND } from "src/helpers/convertVND";
 import moment from "moment";
-// import * as XLSXChart  from "xlsx-chart"
+import XlsxTemplate from "xlsx-template"
 const XLSXChart: any = require("xlsx-chart")
 const xlsxChart = new XLSXChart()
 @Injectable()
@@ -913,71 +913,83 @@ export class InvoiceService {
       //  return listDataQ1
    }
 
-   async insertCharts(data: any, pathExample: any) {
-       var opts = {
-        // file:"chart.xlsx",
-        file:join(__dirname,'..','..','src/templates/excel/chart.xlsx'),
-        chart: "column",
-          titles: [
-            "Title 1",
-            "Title 2",
-            "Title 3"
-          ],
-          fields: [
-            "Field 1",
-            "Field 2",
-            "Field 3",
-            "Field 4"
-          ],
-          data: {
-            "Title 1": {
-              "Field 1": 5,
-              "Field 2": 10,
-              "Field 3": 15,
-              "Field 4": 20 
-            },
-            "Title 2": {
-              "Field 1": 10,
-              "Field 2": 5,
-              "Field 3": 20,
-              "Field 4": 15
-            },
-            "Title 3": {
-              "Field 1": 20,
-              "Field 2": 15,
-              "Field 3": 10,
-              "Field 4": 5
-            }
-          }
-       }
-       xlsxChart.writeFile (opts, function (err: any) {
-        console.log ("File: ", opts.file);
-      });
-   }
 
-    async exportFileReport(res:any) : Promise<any> {
-      const path = join(__dirname,'..','..','src/templates/excel/TEST2.xlsx')
-      const templatefile = await readFileSync(path)   
-    
-      const workbook = new ExcelJS.Workbook();
+   async insertChartWithXlSXTemplate(data: any[], workbook: any, fileRead: any) : Promise<any>{
+     try {
       const nowDate = new Date()
       const currentYear = nowDate.getFullYear()
       const dataReport =await this.getDataReport(currentYear)
-      await this.insertCharts([], path)
-      //doc file chart
+      dataReport.sort((a, b) => {
+
+        return b.total.thucte - a.total.thucte
+      })
+   
+      const dataSubmit: any[] = []
+      dataReport.map((item :any,index: number) => {
+         if(index <10) {
+             dataSubmit.push(  {
+              tensanpham: item?.tensanpham || "",
+              q1: item?.current_q1 ?  item?.current_q1.thucte  : 0,
+              q2: item?.current_q2 ?  item?.current_q2.thucte  : 0,
+              q3: item?.current_q3 ?  item?.current_q3.thucte  : 0,
+              q4: item?.current_q4 ?  item?.current_q4.thucte  : 0,
+              q5: item?.pre_q1 ?  item?.pre_q1.thucte  : 0,
+              q6: item?.pre_q2 ?  item?.pre_q2.thucte  : 0,
+              q7: item?.pre_q3 ?  item?.pre_q3.thucte  : 0,
+              q8: item?.pre_q4 ?  item?.pre_q4.thucte  : 0,
+              total: item?.total ? item?.total.thucte : 0
     
-      const chartFile = await readFileSync(join(__dirname,'..','..','src/templates/excel/chart.xlsx'))
+            })
+         }
+       })
+    
+        var template = new XlsxTemplate(fileRead)
+        var values = {
+          // sanpham: [
+          //   {tensanpham:"Sản phẩm 1", q1: 2,q2: 23,q3: 65,q4: 56,q5: 23,q6: 86,q7: 65,q8: 43},
+          //   {tensanpham:"Sản phẩm 2", q1: 2,q2: 23,q3: 65,q4: 56,q5: 23,q6: 86,q7: 65,q8: 43,},
+          //   {tensanpham:"Sản phẩm 3", q1: 2,q2: 23,q3: 65,q4: 56,q5: 23,q6: 86,q7: 65,q8: 43,},
+          //   {tensanpham:"Sản phẩm 4", q1: 2,q2: 23,q3: 65,q4: 56,q5: 23,q6: 86,q7: 65,q8: 43,},
+          //   {tensanpham:"Sản phẩm 5", q1: 2,q2: 23,q3: 65,q4: 56,q5: 23,q6: 86,q7: 65,q8: 43,},
+          //   {tensanpham:"Sản phẩm 6", q1: 2,q2: 23,q3: 65,q4: 56,q5: 23,q6: 86,q7: 65,q8: 43,},
+          //   {tensanpham:"Sản phẩm 7", q1: 2,q2: 23,q3: 65,q4: 56,q5: 23,q6: 86,q7: 65,q8: 43,},
+          //   {tensanpham:"Sản phẩm 8", q1: 2,q2: 23,q3: 65,q4: 56,q5: 23,q6: 86,q7: 65,q8: 43,},
+          //   {tensanpham:"Sản phẩm 9", q1: 2,q2: 23,q3: 65,q4: 56,q5: 23,q6: 86,q7: 65,q8: 43,},
 
-  
-      await workbook.xlsx.load(templatefile)
+          // ]
+          sanpham: dataSubmit
 
-      // const countProduct = await this.productRepositorty.count()
+        }
+        template.substitute(1, values)
+        var arrayBuffur = template.generate({type: "arraybuffer"});
+        var excelBufferData = Buffer.from(arrayBuffur);
+        return excelBufferData
+     }  catch (err: any) {    
+        console.log(err)
+        throw new BadRequestException(err.message);
+     }
+       
+   }
+
+    async exportFileReport(res:any) : Promise<any> {
+      const path = join(__dirname,'..','..','src/templates/excel/ExampleBaoCao.xlsx')   
+      const workbook = new ExcelJS.Workbook();
       
-      const worksheet = workbook.getWorksheet("BaoCaoDoanhThu")
-       const years = [`${currentYear} Q1`, `${currentYear} Q2`, `${currentYear} Q3`, `${currentYear} Q4`, 
-                         `${currentYear - 1} Q1`, `${currentYear - 1} Q2`, `${currentYear - 1} Q3`, `${currentYear - 1} Q4`, `Tổng`]
+      const templatefile = readFileSync(path) 
+      //  const examplaeFile = await this.insertChartWithXlSXTemplate([],workbook, templatefile )
+      // //  if(!examplaeFile) return;
+      
+      const nowDate = new Date()
+      const currentYear = nowDate.getFullYear()
+      const dataReport =await this.getDataReport(currentYear)
 
-      // return dataReport
+     await workbook.xlsx.load(templatefile) 
+      
+      const worksheet = workbook.getWorksheet(1)
+      worksheet.state = "visible"
+      const years = [`${currentYear} Q1`, `${currentYear} Q2`, `${currentYear} Q3`, `${currentYear} Q4`, 
+                         `${currentYear - 1} Q1`, `${currentYear - 1} Q2`, `${currentYear - 1} Q3`, `${currentYear - 1} Q4`, `Tổng`]
+       
 
       ///tieu de
       const rowHeader = worksheet.getRow(5)
@@ -1198,7 +1210,7 @@ export class InvoiceService {
               // const rowValue1Pre = worksheet.getRow(12)
               // const colValueUocTinh1Pre = rowValue1Pre.getCell(startCol)
               // const colValueThucTe1Pre = rowValue1Pre.getCell(startCol + 1)
-              // colValueUocTinh1Pre.value =  VND.format(item.pre_q1.uoctinh)
+              // colValueUocTinh1Pre.value =   VND.format(item.pre_q1.uoctinh)
               // colValueThucTe1Pre.value =  VND.format(item.pre_q1.thucte)
               // this.styleValue(colValueUocTinh1Pre)
               // this.styleValue(colValueThucTe1Pre)
@@ -1270,6 +1282,7 @@ export class InvoiceService {
       res.setHeader('Content-Disposition', `attachment; filename=${`BaoCaoDoanhThu1.xlsx`}`);
       await workbook.xlsx.write(res)
       res.send()
+      // res.end(workbook)
       return path
   }
 

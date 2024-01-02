@@ -126,9 +126,12 @@ export class ShipmentService {
 
     const workbook = xlsx.read(file.buffer);
     const sheetNames = workbook.SheetNames[0];
-
     const count_material = workbook.Sheets[sheetNames].E9.v;
     const id_employee = workbook.Sheets[sheetNames].E7.v;
+
+
+    //id_employee
+    
     const supplier = {
       name: workbook.Sheets[sheetNames].L6.v,
       phone_number: workbook.Sheets[sheetNames].L7.v,

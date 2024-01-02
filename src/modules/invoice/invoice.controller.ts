@@ -15,7 +15,7 @@ import { ROLES } from "src/constants/role.enum";
 import { RolesGuard } from "src/guards/role.guard";
 import { Roles } from "src/decorator/role.decorator";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { createReadStream, readFileSync } from "fs";
+import {  readFileSync } from "fs";
 import { join } from "path";
 import { Response } from "express";
 @ApiTags("invoice")
@@ -130,6 +130,21 @@ export class InvoiceController {
   async exportReport(@Res() res: Response) {
    const data = await this.invoiceService.exportFileReport(res)
   //  await this.invoiceService.insertCharts(res)
+  }
+
+  @ApiBearerAuth()
+  @Get("/file/bieudo")
+  async bieudo(@Res() res: Response) {
+    const path = join(__dirname,'..','..','src/templates/excel/BIEUDO.xlsx')   
+    const templatefile = readFileSync(path) 
+  
+    const data = await this.invoiceService.insertChartWithXlSXTemplate([], [], templatefile)
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename=${`BieuDo.xlsx`}`);
+    // await workbook.xlsx.write(res)
+    res.send(data)
+
+
   }
 
 }
