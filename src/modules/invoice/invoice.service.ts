@@ -44,6 +44,7 @@ import {readFile, readFileSync} from 'fs'
 import { Cell,Row } from "exceljs";
 import ExcelJS from "exceljs"
 import { VND } from "src/helpers/convertVND";
+import moment from "moment";
 @Injectable()
 export class InvoiceService {
   constructor(
@@ -630,27 +631,7 @@ export class InvoiceService {
      return dataSend
   }
 
-  // async exportFileReport() {
-  //   const path = join(__dirname,'..','..','src/templates/excel/TEST2.xlsx')
-  //   const data = await readFileSync(path)
-  //   const options = {imageRatio : 75.4}
-  //   var template = new XlsxTemplate(data, options)
-  //   const fakeData = {
-  //       tensanpham:["Nam","HUNG","CUONG","PHUC"],
-  //       title:[ { uoctinh: "ƯỚC TÍNH",thucte:"THỰC TẾ" }, {uoctinh: "ƯỚC TÍNH",thucte:"THỰC TẾ"},{uoctinh: "ƯỚC TÍNH",thucte:"THỰC TẾ" },{uoctinh: "ƯỚC TÍNH",thucte:"THỰC TẾ"}],
-  //       priceQ1:[{ uoctinh: "10",thucte:"20" },{uoctinh: "10",thucte:"30"},{uoctinh: "20", thucte:"10"},{uoctinh: "40",thucte:"50"}],
-  //       priceQ2:[{ uoctinh: "10",thucte:"20" },{uoctinh: "10",thucte:"30"},{uoctinh: "20", thucte:"10"},{uoctinh: "40",thucte:"50"}],
-  //       priceQ3:[{ uoctinh: "10",thucte:"20" },{uoctinh: "10",thucte:"30"},{uoctinh: "20", thucte:"10"},{uoctinh: "40",thucte:"50"}],
-  //       priceQ4:[{ uoctinh: "10",thucte:"20" },{uoctinh: "10",thucte:"30"},{uoctinh: "20", thucte:"10"},{uoctinh: "40",thucte:"50"}],   
-  //   }
-
-   
-  //   var sheetNumber = 1
-  //   template.substitute(sheetNumber, fakeData)
-  //   const file = template.generate()
-    
-  //   return template
-  // }
+ 
 
    stylCellHeader(cell: Cell) {
      cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
@@ -723,11 +704,11 @@ export class InvoiceService {
 
    styleValue (cell: Cell) {
     cell.alignment = {  wrapText: true, vertical: 'middle', horizontal: 'right', };
-    cell.font = {size: 10, family: 1, bold:true};
+    cell.font = {size: 10, family: 1};
     cell.fill =  {
       type: 'pattern',
       pattern:'solid',
-      // fgColor:{ argb:'ffff' }
+      fgColor:{ argb:'ffffff' }
     },
     cell.border= {
       top: { style: 'medium',  color: { argb: 'cccccc' }  },
@@ -738,77 +719,272 @@ export class InvoiceService {
     }
    }
 
+   async AddToMap(array: any[], time: string, combinedData: any) {
+      //  let index = 1 ;
+      for (const item of array) {
+        
+        // console.log(index)
+        // index = index + 1
+        const key = item.id_product ? `product_${item.id_product}` : `combo_${item.id_combo}` ;
+        if (combinedData.has(key)) {
+
+          const existingItem = combinedData.get(key);
+          existingItem[`${time}`] = {thucte: item?.dataValues?.totalPrice || 0,uoctinh:item?.product ? item?.product?.price * item.amount : item?.combo?.price * item.amount}
+          existingItem.total = {
+            thucte: existingItem.total.thucte +  existingItem[`${time}`].thucte,
+            uoctinh: existingItem.total.uoctinh +  existingItem[`${time}`].uoctinh,
+          }
+        } else {
+          // tensanpham:"San pham 1",
+          // current_q1: {uoctinh: 10, thucte:20},
+          // current_q2: {uoctinh: 43, thucte:98},
+          // current_q3: {uoctinh: 12, thucte:124},
+          // current_q4: {uoctinh: 16, thucte:33},
+          // pre_q1: {uoctinh: 16, thucte:33},
+          // pre_q2: {uoctinh: 16, thucte:33},
+          // pre_q3: {uoctinh: 16, thucte:33},
+          // pre_q4: {uoctinh: 16, thucte:33},
+          // total: {uoctinh: 101, thucte: 102}
+          const data = {
+            tensanpham: item?.product ? item?.product?.name : item?.combo?.name,
+            current_q1: {uoctinh:0, thucte:0},
+            current_q2: {uoctinh:0, thucte:0},
+            current_q3: {uoctinh:0, thucte:0},
+            current_q4: {uoctinh:0, thucte:0},
+            pre_q1: {uoctinh:0, thucte:0},
+            pre_q2: {uoctinh:0, thucte:0},
+            pre_q3: {uoctinh:0, thucte:0},
+            pre_q4: {uoctinh:0, thucte:0},
+            total: {uoctinh: 0, thucte: 0}
+
+          }
+          data[`${time}`] = {thucte: item?.dataValues?.totalPrice || 0,uoctinh:item?.product ? item?.product?.price * item?.amount : item?.combo?.price * item?.amount}
+          data.total = {
+            thucte: data.total.thucte +  data[`${time}`].thucte,
+            uoctinh: data.total.uoctinh +  data[`${time}`].uoctinh,
+          }
+          combinedData.set(key, data);
+        }
+      }
+  }
+
+   async getDataReport(curretYear: any) {
+    const combinedData = new Map()
+      ////******** GET CURRENT YEAR ****************///////
+
+      const listDataQ1 = await this.invoiceDetaiRepository.findAll({
+       
+        where:{[Op.or] : [{id_product: {[Op.not]: null}}, {id_combo: {[Op.not]: null}}], 
+        createdAt: {
+          [Op.gte]:  moment(`${curretYear}-1-1 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+          [Op.lt]: moment(`${curretYear}-3-31 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+        
+        },
+      },
+      include: [{model:Product}, {model: Combo}], 
+      attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+      group: ["id_product", "id_combo"], 
+      })
+
+      const listDataQ2 = await this.invoiceDetaiRepository.findAll({
+        
+        where:{[Op.or] : [{id_product: {[Op.not]: null}}, {id_combo: {[Op.not]: null}}], 
+        createdAt: {
+          [Op.gte]:  moment(`${curretYear}-4-1 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+          [Op.lt]: moment(`${curretYear}-6-31 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+        
+        },
+      },
+      include: [{model:Product}, {model: Combo}], 
+      attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+      group: ["id_product", "id_combo"], 
+      })
+
+      const listDataQ3 = await this.invoiceDetaiRepository.findAll({
+      
+        where:{[Op.or] : [{id_product: {[Op.not]: null}}, {id_combo: {[Op.not]: null}}], 
+        createdAt: {
+          [Op.gte]:  moment(`${curretYear}-7-1 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+          [Op.lt]: moment(`${curretYear}-9-31 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+        
+        },
+      },
+      include: [{model:Product}, {model: Combo}], 
+      attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+      group: ["id_product", "id_combo"], 
+      })
+
+      const listDataQ4 = await this.invoiceDetaiRepository.findAll({
+       
+        where:{[Op.or] : [{id_product: {[Op.not]: null}}, {id_combo: {[Op.not]: null}}], 
+        createdAt: {
+          [Op.gte]:  moment(`${curretYear}-10-1 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+          [Op.lt]: moment(`${curretYear}-12-31 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+        
+        },
+      },
+      include: [{model:Product}, {model: Combo}], 
+      attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+      group: ["id_product", "id_combo"], 
+      })
+
+      
+
+      /////////////////////////////////////////////////
+
+      ////******** GET PRE YEAR ****************///////
+      const listDataQ1Pre = await this.invoiceDetaiRepository.findAll({
+        
+        where:{[Op.or] : [{id_product: {[Op.not]: null}}, {id_combo: {[Op.not]: null}}], 
+        createdAt: {
+          [Op.gte]:  moment(`${curretYear}-1-1 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+          [Op.lt]: moment(`${curretYear}-3-31 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+        
+        },
+      },
+        include: [{model:Product}, {model: Combo}], 
+        attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+        group: ["id_product", "id_combo"], 
+      })
+
+      const listDataQ2Pre = await this.invoiceDetaiRepository.findAll({
+        
+        where:{[Op.or] : [{id_product: {[Op.not]: null}}, {id_combo: {[Op.not]: null}}], 
+        createdAt: {
+          [Op.gte]:  moment(`${curretYear}-4-1 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+          [Op.lt]: moment(`${curretYear}-6-31 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+        
+        },
+      },
+      include: [{model:Product}, {model: Combo}], 
+      attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+      group: ["id_product", "id_combo"], 
+      })
+
+      const listDataQ3Pre = await this.invoiceDetaiRepository.findAll({
+        
+        where:{[Op.or] : [{id_product: {[Op.not]: null}}, {id_combo: {[Op.not]: null}}], 
+        createdAt: {
+          [Op.gte]:  moment(`${curretYear}-7-1 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+          [Op.lt]: moment(`${curretYear}-9-31 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+        
+        },
+      },
+        include: [{model:Product}, {model: Combo}], 
+        attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+        group: ["id_product", "id_combo"], 
+      })
+
+      const listDataQ4Pre = await this.invoiceDetaiRepository.findAll({
+        where:{
+          [Op.or] : [{id_product: {[Op.not]: null}}, {id_combo: {[Op.not]: null}}], 
+          createdAt: {
+            [Op.gte]: moment(`${curretYear - 1}-10-1 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+            [Op.lt]: moment(`${curretYear - 1}-12-31 00:00:00`, "YYYY-MM-DD HH:mm:ss").toISOString(),
+          },
+        },       
+         include: [{model:Product}, {model: Combo}], 
+         attributes:[[Sequelize.col("Product.id"), "id_product"],[Sequelize.col("Combo.id"), "id_combo"],[Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.price"), 'float')), "totalPrice"], [Sequelize.fn("SUM", Sequelize.cast(Sequelize.col("InvoiceDetail.amount"), 'float')), "amount"],],
+         group: ["id_product", "id_combo"], 
+  
+          
+      })
+
+
+
+      await this.AddToMap(listDataQ1,"current_q1",combinedData)
+      await this.AddToMap(listDataQ2,"current_q2",combinedData)
+      await this.AddToMap(listDataQ3,"current_q3",combinedData)
+      await this.AddToMap(listDataQ4,"current_q4",combinedData)
+      await this.AddToMap(listDataQ1Pre,"pre_q1",combinedData)
+      await this.AddToMap(listDataQ2Pre,"pre_q2",combinedData)
+      await this.AddToMap(listDataQ3Pre,"pre_q3",combinedData)
+      await this.AddToMap(listDataQ4Pre,"pre_q4",combinedData)
+      
+
+
+       const dataRes = Array.from(combinedData.values())
+       
+      ////////////////////////////////////////////////////////
+      return dataRes
+      //  return listDataQ1
+   }
+
     async exportFileReport(res:any) : Promise<any> {
       const path = join(__dirname,'..','..','src/templates/excel/TEST2.xlsx')
       const templatefile = await readFileSync(path)   
       const workbook = new ExcelJS.Workbook();
       const nowDate = new Date()
       const currentYear = nowDate.getFullYear()
+      const dataReport =await this.getDataReport(currentYear)
       
       await workbook.xlsx.load(templatefile)
 
-      const countProduct = await this.productRepositorty.count()
+      // const countProduct = await this.productRepositorty.count()
+      
       const worksheet = workbook.getWorksheet("BaoCaoDoanhThu")
 
-      const fakeData = [ 
-        {
-          tensanpham:"San pham 1",
-          current_q1: {uoctinh: 10, thucte:20},
-          current_q2: {uoctinh: 43, thucte:98},
-          current_q3: {uoctinh: 12, thucte:124},
-          current_q4: {uoctinh: 16, thucte:33},
-          pre_q1: {uoctinh: 16, thucte:33},
-          pre_q2: {uoctinh: 16, thucte:33},
-          pre_q3: {uoctinh: 16, thucte:33},
-          pre_q4: {uoctinh: 16, thucte:33},
-          total: {uoctinh: 101, thucte: 102}
-        },
-        {
-          tensanpham:"San pham 2",
-          current_q1: {uoctinh: 10, thucte:20},
-          current_q2: {uoctinh: 43, thucte:98},
-          current_q3: {uoctinh: 12, thucte:124},
-          current_q4: {uoctinh: 16, thucte:33},
-          pre_q1: {uoctinh: 16, thucte:33},
-          pre_q2: {uoctinh: 16, thucte:33},
-          pre_q3: {uoctinh: 16, thucte:33},
-          pre_q4: {uoctinh: 16, thucte:33},
-          total: {uoctinh: 101, thucte: 102}
+      // const fakeData = [ 
+      //   {
+      //     tensanpham:"San pham 1",
+      //     current_q1: {uoctinh: 10, thucte:20},
+      //     current_q2: {uoctinh: 43, thucte:98},
+      //     current_q3: {uoctinh: 12, thucte:124},
+      //     current_q4: {uoctinh: 16, thucte:33},
+      //     pre_q1: {uoctinh: 16, thucte:33},
+      //     pre_q2: {uoctinh: 16, thucte:33},
+      //     pre_q3: {uoctinh: 16, thucte:33},
+      //     pre_q4: {uoctinh: 16, thucte:33},
+      //     total: {uoctinh: 101, thucte: 102}
+      //   },
+      //   {
+      //     tensanpham:"San pham 2",
+      //     current_q1: {uoctinh: 10, thucte:20},
+      //     current_q2: {uoctinh: 43, thucte:98},
+      //     current_q3: {uoctinh: 12, thucte:124},
+      //     current_q4: {uoctinh: 16, thucte:33},
+      //     pre_q1: {uoctinh: 16, thucte:33},
+      //     pre_q2: {uoctinh: 16, thucte:33},
+      //     pre_q3: {uoctinh: 16, thucte:33},
+      //     pre_q4: {uoctinh: 16, thucte:33},
+      //     total: {uoctinh: 101, thucte: 102}
 
 
-        },
-        {
-          tensanpham:"San pham 3",
-          current_q1: {uoctinh: 10, thucte:20},
-          current_q2: {uoctinh: 43, thucte:98},
-          current_q3: {uoctinh: 12, thucte:124},
-          current_q4: {uoctinh: 16, thucte:33},
-          pre_q1: {uoctinh: 16, thucte:33},
-          pre_q2: {uoctinh: 16, thucte:33},
-          pre_q3: {uoctinh: 16, thucte:33},
-          pre_q4: {uoctinh: 16, thucte:33},
-          total: {uoctinh: 101, thucte: 102}
+      //   },
+      //   {
+      //     tensanpham:"San pham 3",
+      //     current_q1: {uoctinh: 10, thucte:20},
+      //     current_q2: {uoctinh: 43, thucte:98},
+      //     current_q3: {uoctinh: 12, thucte:124},
+      //     current_q4: {uoctinh: 16, thucte:33},
+      //     pre_q1: {uoctinh: 16, thucte:33},
+      //     pre_q2: {uoctinh: 16, thucte:33},
+      //     pre_q3: {uoctinh: 16, thucte:33},
+      //     pre_q4: {uoctinh: 16, thucte:33},
+      //     total: {uoctinh: 101, thucte: 102}
 
 
-        },
-        {
-          tensanpham:"San pham 4",
-          current_q1: {uoctinh: 10, thucte:20},
-          current_q2: {uoctinh: 43, thucte:98},
-          current_q3: {uoctinh: 12, thucte:124},
-          current_q4: {uoctinh: 16, thucte:33},
-          pre_q1: {uoctinh: 16, thucte:33},
-          pre_q2: {uoctinh: 16, thucte:33},
-          pre_q3: {uoctinh: 16, thucte:33},
-          pre_q4: {uoctinh: 16, thucte:33},
-          total: {uoctinh: 101, thucte: 102}
+      //   },
+      //   {
+      //     tensanpham:"San pham 4",
+      //     current_q1: {uoctinh: 10, thucte:20},
+      //     current_q2: {uoctinh: 43, thucte:98},
+      //     current_q3: {uoctinh: 12, thucte:124},
+      //     current_q4: {uoctinh: 16, thucte:33},
+      //     pre_q1: {uoctinh: 16, thucte:33},
+      //     pre_q2: {uoctinh: 16, thucte:33},
+      //     pre_q3: {uoctinh: 16, thucte:33},
+      //     pre_q4: {uoctinh: 16, thucte:33},
+      //     total: {uoctinh: 101, thucte: 102}
 
 
-        }
-       ]
+      //   }
+      //  ]
 
        const years = [`${currentYear} Q1`, `${currentYear} Q2`, `${currentYear} Q3`, `${currentYear} Q4`, 
                          `${currentYear - 1} Q1`, `${currentYear - 1} Q2`, `${currentYear - 1} Q3`, `${currentYear - 1} Q4`, `Tổng`]
+
+      // return dataReport
 
       ///tieu de
       const rowHeader = worksheet.getRow(5)
@@ -818,94 +994,283 @@ export class InvoiceService {
         Number(cellHeader.row),
         Number(cellHeader.col),
         Number(cellHeader.row),
-        Number(cellHeader.col + countProduct*2) - 1 ,
+        Number(cellHeader.col + dataReport.length*2) - 1 ,
         // "BaoCaoDoanhThu"
       )
       this.stylCellHeader(cellHeader)
-      /////////
+      ////////
+      let startColYear = 8
 
-      /// content
-      let startCol = 3
-      fakeData.forEach((item: any) => {
-         
-          // set witdh for columns
-          const columns = [
-            { key:"uoctinh", header:""},
-            { key:"thucte", header:""},
-          ] 
-          worksheet.getColumn(startCol).width = 15
-          worksheet.getColumn(startCol + 1).width = 15      
-          ////
-          ///ten san pham
-          const rowNameProduct = worksheet.getRow(6)
-          const colNameProduct = rowNameProduct.getCell(startCol)
-         
-          worksheet.mergeCells(
-            Number(colNameProduct.row),
-            Number(colNameProduct.col),
-            Number(colNameProduct.row),
-            Number(colNameProduct.col) + 1 ,
-            // "BaoCaoDoanhThu"
-          )
-          colNameProduct.value = item.tensanpham
-          this.styleCellNameProduct(colNameProduct)
-          ///////
-          ///uoc tinh, thuc te
-          const rowUocTinh = worksheet.getRow(7)
-          const colUocTinh = rowUocTinh.getCell(startCol)
-          const colThucTe = rowUocTinh.getCell(startCol + 1)
-           colUocTinh.value = "ƯỚC TÍNH"
-           colThucTe.value = "THỰC TẾ"
-           this.styleUocATinhThucTe(colUocTinh)
-           this.styleUocATinhThucTe(colThucTe)
-          //////// lít year
-          let startColYear = 8
-          years.forEach((item1) => {
-            let index = 1
-              /// sidebar 
-              const rowYear = worksheet.getRow(startColYear)
-              const colYear = rowYear.getCell(2)
-              colYear.value = item1
-              this.styleListSidebarYear(colYear)
-
-              ///value
-              const colValueUocTinh = rowYear.getCell(startCol)
-              const colValueThucTe = rowYear.getCell(startCol + 1)
-              if(index <= 4) {
-                
-                colValueUocTinh.value = VND.format(item[`current_q${index}`].uoctinh)
-                colValueThucTe.value = VND.format(item[`current_q${index}`].thucte)
-              } else if (index > 8) {
-             
-                colValueUocTinh.value = VND.format(item[`total`].uoctinh)
-                colValueThucTe.value = VND.format(item[`total`].thucte)
-              } else {
-              
-                colValueUocTinh.value = VND.format(item[`pre_q${index - 4}`].uoctinh)
-                colValueThucTe.value = VND.format(item[`pre_q${index - 4}`].thucte)
-              }
-              this.styleValue(colValueUocTinh)
-              this.styleValue(colValueThucTe)
-              colValueThucTe.fill =  {
-                type: 'pattern',
-                pattern:'solid',
-                fgColor:{ argb:'F6E3CE' }
-              },
-
-              ///
-              index + 1
-              startColYear += 1
-          })
-          /////
-         
-           startCol += 2;
+      ///*******  SIDEBAR */
+      years.forEach((item1) => {
+        const rowYear = worksheet.getRow(startColYear)
+        const colYear = rowYear.getCell(2)
+        colYear.value = item1
+        this.styleListSidebarYear(colYear)
+        startColYear  = startColYear + 1
       })
 
 
+      ////***FOOTER */
+      const position = Number(cellHeader.col + dataReport.length*2) - 1
+      const rowFooter = worksheet.getRow(17)
+      const colStartFooterTitleUocTinh  = rowFooter.getCell(position - 7) 
+      const colStartFooterValueUocTinh = rowFooter.getCell(position-5)
+
+      const colStartFooterTitleThucTe = rowFooter.getCell(position - 3)
+      const colStartFooterValueThucTe = rowFooter.getCell(position - 1)
+      worksheet.mergeCells(
+        Number(colStartFooterTitleUocTinh.row),
+        Number(colStartFooterTitleUocTinh.col),
+        Number(colStartFooterTitleUocTinh.row + 1),
+        Number(colStartFooterTitleUocTinh.col + 1),
+      )
+      worksheet.mergeCells(
+        Number(colStartFooterValueUocTinh.row),
+        Number(colStartFooterValueUocTinh.col),
+        Number(colStartFooterValueUocTinh.row + 1),
+        Number(colStartFooterValueUocTinh.col + 1),
+      )
+      worksheet.mergeCells(
+        Number(colStartFooterTitleThucTe.row),
+        Number(colStartFooterTitleThucTe.col),
+        Number(colStartFooterTitleThucTe.row + 1),
+        Number(colStartFooterTitleThucTe.col + 1),
+      )
+      worksheet.mergeCells(
+        Number(colStartFooterValueThucTe.row),
+        Number(colStartFooterValueThucTe.col),
+        Number(colStartFooterValueThucTe.row + 1),
+        Number(colStartFooterValueThucTe.col + 1),
+      )
+
+      colStartFooterTitleUocTinh.value = "TỔNG ƯỚC TÍNH"
+      colStartFooterTitleThucTe.value = "TỔNG THỰC TẾ"
+      this.stylCellHeader(colStartFooterTitleThucTe)
+      this.stylCellHeader(colStartFooterTitleUocTinh)
+      let priceThucte = 0
+      let priceUocTinh = 0
+      dataReport.forEach((item: any) => {
+         priceThucte = priceThucte + item?.total?.thucte
+         priceUocTinh = priceUocTinh + item?.total?.uoctinh
+      })
+
+    
+      // const priceUocTinh
+
+      colStartFooterValueThucTe.value = VND.format(priceThucte)
+      colStartFooterValueUocTinh.value = VND.format(priceUocTinh)
+
+      this.styleValue(colStartFooterValueThucTe)
+      this.styleValue(colStartFooterValueUocTinh)
+      colStartFooterValueThucTe.fill = {type: 'pattern',pattern:'solid',fgColor:{ argb:'F6E3CE' }}
+      colStartFooterValueThucTe.font = {size: 10, family: 1, bold: true}
+      colStartFooterValueThucTe.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+
+      colStartFooterValueUocTinh.fill = {type: 'pattern',pattern:'solid',fgColor:{ argb:'F6E3CE' }}
+      colStartFooterValueUocTinh.font = {size: 10, family: 1, bold: true}
+      colStartFooterValueUocTinh.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+  
+
+      ////***FOOTER */
 
 
+      /////************** */
+      let startCol = 3
+      dataReport.forEach((item: any) => {
+             worksheet.getColumn(startCol).width = 15
+            worksheet.getColumn(startCol + 1).width = 15 
+            //****TEN SAN PHAM */
+            const rowNameProduct = worksheet.getRow(6)
+            const colNameProduct = rowNameProduct.getCell(startCol)
+            worksheet.mergeCells(
+              Number(colNameProduct.row),
+              Number(colNameProduct.col),
+              Number(colNameProduct.row),
+              Number(colNameProduct.col) + 1 ,
+              // "BaoCaoDoanhThu"
+            )
+            colNameProduct.value = item.tensanpham
+            this.styleCellNameProduct(colNameProduct)
+            //****TEN SAN PHAM */
 
-      /////////
+            //****UOC TINH, THUIC TE */
+            const rowUocTinh = worksheet.getRow(7)
+            const colUocTinh = rowUocTinh.getCell(startCol)
+            const colThucTe = rowUocTinh.getCell(startCol + 1)
+            colUocTinh.value = "ƯỚC TÍNH"
+            colThucTe.value = "THỰC TẾ"
+            this.styleUocATinhThucTe(colUocTinh)
+            this.styleUocATinhThucTe(colThucTe)
+            //****UOC TINH, THUIC TE */
+
+            //****VALUE */
+              for(let i = 8 ; i<=11 ; i++) {
+                const rowValue1 = worksheet.getRow(i)
+                const colValueUocTinh1 = rowValue1.getCell(startCol)
+                const colValueThucTe1 = rowValue1.getCell(startCol + 1)
+                colValueUocTinh1.value =  VND.format(item[`current_q${i - 7}`].uoctinh)
+                colValueThucTe1.value =  VND.format(item[`current_q${i - 7}`].thucte)
+                this.styleValue(colValueUocTinh1)
+                this.styleValue(colValueThucTe1)
+                colValueThucTe1.fill ={
+                  type: 'pattern',
+                  pattern:'solid',
+                  fgColor:{ argb:'F6E3CE' }
+                };
+              }
+
+              for(let i = 12 ; i<=15 ; i++) {
+                const rowValue1 = worksheet.getRow(i)
+                const colValueUocTinh1 = rowValue1.getCell(startCol)
+                const colValueThucTe1 = rowValue1.getCell(startCol + 1)
+                colValueUocTinh1.value =  VND.format(item[`pre_q${i - 11}`].uoctinh)
+                colValueThucTe1.value =  VND.format(item[`pre_q${i - 11}`].thucte)
+                this.styleValue(colValueUocTinh1)
+                this.styleValue(colValueThucTe1)
+                colValueThucTe1.fill ={
+                  type: 'pattern',
+                  pattern:'solid',
+                  fgColor:{ argb:'F6E3CE' }
+                };
+              }
+
+              const rowValueTotal = worksheet.getRow(16)
+              const colValueUocTinhTotal= rowValueTotal.getCell(startCol)
+              const colValueThucTeTotal = rowValueTotal.getCell(startCol + 1)
+              colValueUocTinhTotal.value =  VND.format(item.total.uoctinh)
+              colValueThucTeTotal.value =  VND.format(item.total.thucte)
+              this.styleValue(colValueUocTinhTotal)
+              this.styleValue(colValueThucTeTotal)
+              colValueUocTinhTotal.font = {size: 10, family: 1, bold: true}
+              colValueThucTeTotal.font = {size: 10, family: 1, bold: true}
+              colValueThucTeTotal.fill ={
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{ argb:'F6E3CE' }
+              };
+            
+              // const rowValue1 = worksheet.getRow(8)
+              // const colValueUocTinh1 = rowValue1.getCell(startCol)
+              // const colValueThucTe1 = rowValue1.getCell(startCol + 1)
+              // colValueUocTinh1.value =  VND.format(item.current_q1.uoctinh)
+              // colValueThucTe1.value =  VND.format(item.current_q1.thucte)
+              // this.styleValue(colValueUocTinh1)
+              // this.styleValue(colValueThucTe1)
+              // colValueThucTe1.fill ={
+              //   type: 'pattern',
+              //   pattern:'solid',
+              //   fgColor:{ argb:'F6E3CE' }
+              // };
+
+              // const rowValue2 = worksheet.getRow(9)
+              // const colValueUocTinh2 = rowValue2.getCell(startCol)
+              // const colValueThucTe2 = rowValue2.getCell(startCol + 1)
+              // colValueUocTinh2.value =  VND.format(item.current_q2.uoctinh)
+              // colValueThucTe2.value =  VND.format(item.current_q2.thucte)
+              // this.styleValue(colValueUocTinh2)
+              // this.styleValue(colValueThucTe2)
+              // colValueThucTe2.fill ={
+              //   type: 'pattern',
+              //   pattern:'solid',
+              //   fgColor:{ argb:'F6E3CE' }
+              // };
+
+              // const rowValue3 = worksheet.getRow(10)
+              // const colValueUocTinh3 = rowValue3.getCell(startCol)
+              // const colValueThucTe3 = rowValue3.getCell(startCol + 1)
+              // colValueUocTinh3.value =  VND.format(item.current_q3.uoctinh)
+              // colValueThucTe3.value =  VND.format(item.current_q3.thucte)
+              // this.styleValue(colValueUocTinh3)
+              // this.styleValue(colValueThucTe3)
+              // colValueThucTe3.fill ={
+              //   type: 'pattern',
+              //   pattern:'solid',
+              //   fgColor:{ argb:'F6E3CE' }
+              // };
+
+              // const rowValue4 = worksheet.getRow(11)
+              // const colValueUocTinh4 = rowValue4.getCell(startCol)
+              // const colValueThucTe4 = rowValue4.getCell(startCol + 1)
+              // colValueUocTinh4.value =  VND.format(item.current_q4.uoctinh)
+              // colValueThucTe4.value =  VND.format(item.current_q4.thucte)
+              // this.styleValue(colValueUocTinh4)
+              // this.styleValue(colValueThucTe4)
+              // colValueThucTe4.fill ={
+              //   type: 'pattern',
+              //   pattern:'solid',
+              //   fgColor:{ argb:'F6E3CE' }
+              // };
+
+              // const rowValue1Pre = worksheet.getRow(12)
+              // const colValueUocTinh1Pre = rowValue1Pre.getCell(startCol)
+              // const colValueThucTe1Pre = rowValue1Pre.getCell(startCol + 1)
+              // colValueUocTinh1Pre.value =  VND.format(item.pre_q1.uoctinh)
+              // colValueThucTe1Pre.value =  VND.format(item.pre_q1.thucte)
+              // this.styleValue(colValueUocTinh1Pre)
+              // this.styleValue(colValueThucTe1Pre)
+              // colValueThucTe1Pre.fill ={
+              //   type: 'pattern',
+              //   pattern:'solid',
+              //   fgColor:{ argb:'F6E3CE' }
+              // };
+
+              // const rowValue2Pre = worksheet.getRow(13)
+              // const colValueUocTinh2Pre = rowValue2Pre.getCell(startCol)
+              // const colValueThucTe2Pre = rowValue2Pre.getCell(startCol + 1)
+              // colValueUocTinh2Pre.value =  VND.format(item.pre_q2.uoctinh)
+              // colValueThucTe2Pre.value =  VND.format(item.pre_q2.thucte)
+              // this.styleValue(colValueUocTinh2Pre)
+              // this.styleValue(colValueThucTe2Pre)
+              // colValueThucTe2Pre.fill ={
+              //   type: 'pattern',
+              //   pattern:'solid',
+              //   fgColor:{ argb:'F6E3CE' }
+              // };
+
+              // const rowValue3Pre = worksheet.getRow(14)
+              // const colValueUocTinh3Pre = rowValue3Pre.getCell(startCol)
+              // const colValueThucTe3Pre = rowValue3Pre.getCell(startCol + 1)
+              // colValueUocTinh3Pre.value =  VND.format(item.pre_q3.uoctinh)
+              // colValueThucTe3Pre.value =  VND.format(item.pre_q3.thucte)
+              // this.styleValue(colValueUocTinh3Pre)
+              // this.styleValue(colValueThucTe3Pre)
+              // colValueThucTe3Pre.fill ={
+              //   type: 'pattern',
+              //   pattern:'solid',
+              //   fgColor:{ argb:'F6E3CE' }
+              // };
+
+              // const rowValue4Pre = worksheet.getRow(15)
+              // const colValueUocTinh4Pre = rowValue4Pre.getCell(startCol)
+              // const colValueThucTe4Pre = rowValue4Pre.getCell(startCol + 1)
+              // colValueUocTinh4Pre.value =  VND.format(item.pre_q4.uoctinh)
+              // colValueThucTe4Pre.value =  VND.format(item.pre_q4.thucte)
+              // this.styleValue(colValueUocTinh4Pre)
+              // this.styleValue(colValueThucTe4Pre)
+              // colValueThucTe4Pre.fill ={
+              //   type: 'pattern',
+              //   pattern:'solid',
+              //   fgColor:{ argb:'F6E3CE' }
+              // };
+
+              // const rowValueTotal = worksheet.getRow(16)
+              // const colValueUocTinhTotal= rowValueTotal.getCell(startCol)
+              // const colValueThucTeTotal = rowValueTotal.getCell(startCol + 1)
+              // colValueUocTinhTotal.value =  VND.format(item.total.uoctinh)
+              // colValueThucTeTotal.value =  VND.format(item.total.thucte)
+              // this.styleValue(colValueUocTinhTotal)
+              // this.styleValue(colValueThucTeTotal)
+              // colValueThucTeTotal.fill ={
+              //   type: 'pattern',
+              //   pattern:'solid',
+              //   fgColor:{ argb:'F6E3CE' }
+              // };
+
+
+           startCol = startCol + 2
+      })
+      
 
       /// gui file
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

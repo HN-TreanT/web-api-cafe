@@ -129,20 +129,8 @@ export class InvoiceController {
   @Get("/file/report")
   async exportReport(@Res() res: Response) {
    const data = await this.invoiceService.exportFileReport(res)
-   
-  //  res.end(data, 'binary')
-    // const buffer = await workbook.generate({type:"nodebuffer"})
-    // res.setHeader(
-    //   "Content-Type",
-    //   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    // );
-    // res.setHeader(
-    //   "Content-Disposition",
-    //   "attachment; filename=" + "BaoCaoDoanhThu1.xlsx"
-    // );
-
-    // res.end(buffer, 'binary')
-    // res.download(file)
+  //  return {oke: "fjegfjegbf"}
+  //  res.send({data:data})
   }
 
 }
