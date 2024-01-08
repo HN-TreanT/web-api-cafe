@@ -595,7 +595,7 @@ export class InvoiceService {
         coutInvoiceDetail: coutInvoiceDetail,
         topProduct: topProduct,
         countCustomer: countCustomer,
-        doanhthu: test.productMoney ? test?.productMoney - totalShipment : 0 ,
+        doanhthu: test.productMoney ? test?.productMoney : 0 ,
         ...resp
        }   
        return dataSend
