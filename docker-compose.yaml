@@ -9,6 +9,9 @@ services:
       - MYSQL_ROOT_PASSWORD=hnam23012002
     ports:
       - "3308:3306"
+    volumes:
+      - $HOME/database:/var/lib/mysql
+      - ./dbinit/init.sql:/docker-entrypoint-initdb.d/0_init.sql
     networks:
       - cafe_api_network
   backend:
@@ -16,7 +19,7 @@ services:
     container_name: cafe_api
     environment:
       - DB_HOST=database
-      - DB_PORT=3308
+      - DB_PORT=3306
       - DB_USER=root
       - DB_PASS=hnam23012002
       - DB_DIALECT=mysql
@@ -38,6 +41,15 @@ services:
       - "8080:8080"
     depends_on:
       - database
+    networks:
+      - cafe_api_network
+    
+  nginx:
+    build: ./nginx
+    ports:
+      - '3000:80'
+    depends_on:
+      - backend
     networks:
       - cafe_api_network
 networks:
