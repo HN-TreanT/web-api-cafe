@@ -10,7 +10,7 @@ services:
     ports:
       - "3308:3306"
     volumes:
-      - $HOME/database:/var/lib/mysql
+      - $HOME/web-api-cafe/database:/var/lib/mysql
       - ./dbinit/init.sql:/docker-entrypoint-initdb.d/0_init.sql
     networks:
       - cafe_api_network
