@@ -399,9 +399,9 @@ export class InvoiceService {
     // invoice.status = 1;
     invoice.price = paymentInfo.price_current;
     invoice.time_pay = date;
-    const table_foods = await this.tablefoodInvoiceRepository.findAll({ where: { id_invoice: invoice_id } });
-    const id_table_food = table_foods.map((item) => item.id_table);
-    await this.tableFoodRepository.update({ status: 0 }, { where: { id: id_table_food } });
+    // const table_foods = await this.tablefoodInvoiceRepository.findAll({ where: { id_invoice: invoice_id } });
+    // const id_table_food = table_foods.map((item) => item.id_table);
+    // await this.tableFoodRepository.update({ status: 0 }, { where: { id: id_table_food } });
     await invoice.save();
     return invoice;
   }

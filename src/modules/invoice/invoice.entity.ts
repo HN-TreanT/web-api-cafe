@@ -66,7 +66,7 @@ export class Invoice extends Model<Invoice> {
   @Default(0)
   @Column({
     type: DataType.INTEGER, //trang thai :
-  })                        // 0 : chưa thanh toán, chưa hoàn thành ,1 : Hoàn thành ,2: Đơn hủy 
+  })                        // 0 : chưa thanh toán, chưa hoàn thành ,1 : Dang dung bua ,2: Đơn hủy , 3: Hoan thanh
   status: number;
 
   @BelongsTo(() => Employee)
