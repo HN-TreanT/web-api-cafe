@@ -39,7 +39,12 @@ import { DTCheckInventorModule } from "./modules/detail-check-inventory/detail-c
 import { InvoiceDetailModule } from "./modules/invoice_detail/invoice-detail.module";
 import { PaginationMiddleware } from "./middleware/paginantion.middleware";
 import { EventGateway } from "./event.gateway";
-
+import { HttpModule } from "@nestjs/axios";
+import { PassportModule } from "@nestjs/passport";
+import { JwtModule } from "@nestjs/jwt";
+import { jwtContants } from "./constants/jwtConstant";
+import { authProviders } from "./modules/auth/auth.provider";
+import { employeeProviders } from "./modules/employee/employee.provider";
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -61,6 +66,7 @@ import { EventGateway } from "./event.gateway";
     //   },
     // }),
 
+    HttpModule,
     databaseModule,
     LoggerModule,
     StorageModule,
@@ -70,6 +76,7 @@ import { EventGateway } from "./event.gateway";
     MailModule,
     WorkshiftModule,
     EmployeeWorkShiftModule,
+    EmployeeModule,
     PromotionModule,
     ProductModule,
     CustomerModule,
@@ -87,9 +94,17 @@ import { EventGateway } from "./event.gateway";
     CheckInventoryModule,
     DTCheckInventorModule,
     InvoiceDetailModule,
+    PassportModule,
+    JwtModule.register({
+      global: true,
+      secret: jwtContants.secret,
+      signOptions: { expiresIn: "30m" },
+    }),
   ],
   controllers: [AppController],
   providers: [
+    ...employeeProviders,
+    ...authProviders,
     EventGateway,
     AppService,
     {

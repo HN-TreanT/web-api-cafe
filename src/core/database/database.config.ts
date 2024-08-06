@@ -12,11 +12,11 @@ export const databaseConfig: IDatabaseConfig = {
   //   host: process.env.DB_HOST,
   //   port: process.env.DB_PORT,
   //   dialect: process.env.DB_DIALECT,
-    username: "ul71ctbbceafevp7",
-    password: "jSEcatyfs2hr4kowjCdY",
-    database: "bemnn0vlkcwd9rou1es9",
-    host: "bemnn0vlkcwd9rou1es9-mysql.services.clever-cloud.com",
-    port: 3306,
+    username: "root",
+    password: "hnam23012002",
+    database: "cafe",
+    host: "159.223.46.113",
+    port: 3307,
     dialect: "mysql",
     dialectOptions: {
       // useUTC: false, // for reading from database
